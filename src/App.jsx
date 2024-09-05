@@ -11,12 +11,6 @@ function App() {
         <Typography>
           MUI Body
         </Typography>
-        <Typography>
-          MUI Body1
-        </Typography>
-        <Typography>
-          MUI Body2
-        </Typography>
       </Contants>
   );
 }
