@@ -5,11 +5,16 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import Header from './component/Header';
+import DiscountList from './pages/discountList/DiscountList';
 
 const bodyRouter = createBrowserRouter([
   {
     path: '/',
-    element: <App/>,
+    element: <App/>
+  },
+  {
+    path: '/discount-list',
+    element: <DiscountList/>
   }
 ]);
 
