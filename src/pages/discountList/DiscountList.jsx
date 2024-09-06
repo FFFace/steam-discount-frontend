@@ -1,11 +1,37 @@
 import React, { useEffect, useState } from "react";
 import Contants from "../../component/Contants";
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import { axiosInstance } from '../../utils/axios';
+import CustomTypography from '../../component/ui/typography/CustomTypography'
+import styled from "styled-components";
+
+
+
+const Link = styled.a`
+  color: var(--color2)
+`
 
 const DiscountList = () => {
 
   const [discountList, setDiscountList] = useState(null);
+
+  const DiscountListComponent = () =>{    
+    return discountList.map(discount =>(
+      <Link key={discount.id} href={discount.link} target='_blank'>
+        <Box sx={{margin: '15px', padding: '5px', backgroundColor: 'var(--color2)'}}>
+          <CustomTypography sx={{margin: '0px 0px 5px 0px'}}>{discount.name}</CustomTypography>
+          <img src={discount.image}></img>
+          <Box sx={{float: 'right'}}>
+            <CustomTypography color='gray' sx={{display: 'inline', textDecoration: 'line-through'}}>{discount.originPrice}</CustomTypography>
+            <CustomTypography>{discount.discountPrice}</CustomTypography>
+          </Box>        
+          <Box sx={{margin: '5px 20px 0px', float: 'right'}}>
+            <CustomTypography color='#81F680' sx={{padding: '0px 5px 0px 5px', fontSize: '25px', backgroundColor: '#4A610A'}}>{discount.discountPercent}</CustomTypography>
+          </Box>
+        </Box>
+      </Link>
+    ));
+  }
 
   useEffect(()=>{
     const getDiscountList = async () =>{
@@ -22,13 +48,14 @@ const DiscountList = () => {
 
   return(
     <Contants>
-      <Box sx={{backgroundColor: 'var(--color2)'}}>
+      <Box sx={{margin: '15px', backgroundColor: 'var(--color2)'}}>
         <Box sx={{padding: '10px'}}>
-          <Typography variant='h5' color='var(--color4)'>
+          <CustomTypography variant='h5' color='var(--color4)'>
             스팀 할인 목록 100
-          </Typography>
+          </CustomTypography>
         </Box>
       </Box>
+      {discountList ? <DiscountListComponent/> : <></>}
     </Contants>
   );
 };
