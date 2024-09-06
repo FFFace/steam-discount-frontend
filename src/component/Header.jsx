@@ -1,13 +1,19 @@
 import { Typography, Box, Container, Button } from '@mui/material';
 import CustomButton from './ui/button/CustomButton';
-
-
+import { useNavigate } from 'react-router-dom';
 
 const Header = () =>{
+
+  const navigate = useNavigate();
+
+  const onClickDiscountList = () =>{
+    navigate('/discount-list');
+  }
+
   return(
     <Box sx={{display: 'block', margin: '30px 0px 30px 0px'}}>
       <Box sx={{backgroundColor: 'var(--color2)',}}>
-        <CustomButton>
+        <CustomButton onClick={onClickDiscountList}>
           할인 목록
         </CustomButton>
         <CustomButton>
