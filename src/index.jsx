@@ -6,6 +6,14 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import Header from './component/Header';
 import DiscountList from './pages/discountList/DiscountList';
+import Login from './pages/user/Login'
+import { createTheme, ThemeProvider } from '@mui/material';
+
+const theme = createTheme({
+  typography: {
+    fontFamily: '"Noto Sans KR", "Roboto","Helvetica","Arial",sans-serif'
+  }
+})
 
 const bodyRouter = createBrowserRouter([
   {
@@ -15,12 +23,18 @@ const bodyRouter = createBrowserRouter([
   {
     path: '/discount-list',
     element: <DiscountList/>
-  }
+  },
+  {
+    path: '/login',
+    element: <Login/>
+  },
 ]);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <RouterProvider router={bodyRouter}/>
+  <ThemeProvider theme={theme}>
+    <RouterProvider router={bodyRouter}/>
+  </ThemeProvider>  
 );
 
 // If you want to start measuring performance in your app, pass a function

@@ -5,12 +5,6 @@
   --color4: #EEEEEE;
 }
 
-
-@font-face {
-  font-family: 'Noto Sans KR';
-  src: url('../src/assets/Noto_Sans_KR/NotoSansKR-VariableFont_wght.ttf') format('truetype');
-}
-
 body {
   background-color: #222831;
 }
