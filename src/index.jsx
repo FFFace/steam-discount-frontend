@@ -9,6 +9,7 @@ import DiscountList from './pages/discountList/DiscountList';
 import Login from './pages/user/Login'
 import { createTheme, ThemeProvider } from '@mui/material';
 import UserRegister from './pages/user/UserRegister';
+import EmailValidation from './pages/user/EmailValidation';
 
 const theme = createTheme({
   typography: {
@@ -32,6 +33,10 @@ const bodyRouter = createBrowserRouter([
   {
     path: '/user-register',
     element: <UserRegister/>
+  },
+  {
+    path: '/email-validation',
+    element: <EmailValidation/>
   },
 ]);
 
