@@ -8,6 +8,7 @@ import Header from './component/Header';
 import DiscountList from './pages/discountList/DiscountList';
 import Login from './pages/user/Login'
 import { createTheme, ThemeProvider } from '@mui/material';
+import UserRegister from './pages/user/UserRegister';
 
 const theme = createTheme({
   typography: {
@@ -27,6 +28,10 @@ const bodyRouter = createBrowserRouter([
   {
     path: '/login',
     element: <Login/>
+  },
+  {
+    path: '/user-register',
+    element: <UserRegister/>
   },
 ]);
 
