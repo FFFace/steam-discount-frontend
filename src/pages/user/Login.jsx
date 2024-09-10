@@ -4,9 +4,12 @@ import { Box, Button, TextField } from "@mui/material";
 import { CustomBox } from "../../component/ui/box/CustomBox";
 import CustomTypography from "../../component/ui/typography/CustomTypography";
 import { CustomTextField } from "../../component/ui/textField/CustomTextField";
-import CustomButton from "../../component/ui/button/CustomButton";
+import {CustomButton} from "../../component/ui/button/CustomButton";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+
+  const navigate = useNavigate();
 
   const [info, setInfo] = useState({
     email: '',
@@ -20,14 +23,14 @@ const Login = () => {
     });
   }
 
-  const onClickTest = (e) => {
-    console.log(info);
+  const onClickRegister = (e) => {
+    navigate('/user-register');
   }
 
-  const ButtonComponent = ({children}) => {
+  const ButtonComponent = ({...props}) => {
     return(
-      <CustomButton fullWidth sx={{margin: '10px 0px auto', color: 'var(--color1)', fontWeight: 'bold', backgroundColor: 'var(--color3)', ":hover": {boa: 'var(--color1)'}}}>
-        {children}
+      <CustomButton fullWidth sx={{margin: '10px 0px auto', color: 'var(--color1)', fontWeight: 'bold', backgroundColor: 'var(--color3)', ":hover": {boa: 'var(--color1)'}}} {...props}>
+        {props.children}
       </CustomButton>
     )
   }
@@ -54,7 +57,7 @@ const Login = () => {
           <ButtonComponent>
             로그인
           </ButtonComponent>
-          <ButtonComponent>
+          <ButtonComponent onClick={onClickRegister}>
             회원가입
           </ButtonComponent>
         </Box>

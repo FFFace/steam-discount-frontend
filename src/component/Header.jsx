@@ -1,5 +1,5 @@
 import { Typography, Box, Container, Button } from '@mui/material';
-import CustomButton from './ui/button/CustomButton';
+import {CustomButton} from './ui/button/CustomButton';
 import { useNavigate } from 'react-router-dom';
 
 const Header = () =>{

@@ -1,9 +1,9 @@
 import { ThemeProvider, Button, createTheme } from "@mui/material";
 
 
-const CustomButton = ({...props}) => {
+export const CustomButton = ({...props}) => {
   return (
-    <Button size='large' onClick={props.onClick} sx={{
+    <Button size='large' sx={{
         color: 'var(--color4)', 
         ":hover": {
           background: 'var(--color2)'
@@ -14,5 +14,10 @@ const CustomButton = ({...props}) => {
   );
 };
 
-
-export default CustomButton;
+export const CustomButtonWhite = ({...props}) => {
+  return (
+    <CustomButton sx={{margin: '10px 0px auto', width: '100%', color: 'var(--color1)', fontWeight: 'bold', backgroundColor: 'var(--color3)', ":hover": {boardColor: 'var(--color1)'}}} {...props}>
+      {props.children}
+    </CustomButton>
+  );
+};

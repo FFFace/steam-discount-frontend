@@ -14,7 +14,7 @@ const Contants = ({children}) =>{
 }
 
 const Container = styled.div`
-  width: 100vhx;
+  width: 100vwx;
   max-width: 700px;
   height: 100vhx;
   margin: 0 auto;
