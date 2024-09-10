@@ -10,6 +10,10 @@ const Header = () =>{
     navigate('/discount-list');
   }
 
+  const onClickLogin = () => {
+    navigate('/login');
+  }
+
   return(
     <Box sx={{display: 'block', margin: '30px 0px 30px 0px'}}>
       <Box sx={{backgroundColor: 'var(--color2)',}}>
@@ -23,7 +27,7 @@ const Header = () =>{
           커뮤니티
         </CustomButton>
         <Box sx={{float:'right'}}>
-          <CustomButton>
+          <CustomButton onClick={onClickLogin}>
             로그인
           </CustomButton>
         </Box>
