@@ -4,7 +4,8 @@ import { CustomBox } from "../../component/ui/box/CustomBox";
 import { CustomButton, CustomButtonWhite } from "../../component/ui/button/CustomButton";
 import { CustomTextField } from "../../component/ui/textField/CustomTextField";
 import CustomTypography from "../../component/ui/typography/CustomTypography";
-import { Alert } from "@mui/material";
+import { Alert, typographyClasses } from "@mui/material";
+import { axiosInstance } from "../../utils/axios";
 
 const ALTER_ERROR_NOT_INPUT_ALL_INFOMATION = '모든 정보를 입력해주세요.';
 const ALTER_ERROR_NOT_MACHING_PASSWORD = '패스워드가 일치하지 않습니다.';
@@ -26,7 +27,7 @@ const UserRegister = () => {
     email: '',
     password: '',
     passwordValidator: '',
-    name: '',
+    nickname: '',
   });
 
   const [resistable, setResistable] = useState(false);
@@ -38,14 +39,25 @@ const UserRegister = () => {
     });
   };
 
-  const onClickRegister = () => {
-
+  const onClickRegister = async () => {
+    try{
+      const response = await axiosInstance.post('/users', {
+          email: info.email,
+          password: info.password,
+          nickname: info.nickname
+        }
+      );
+      console.log(response.data);
+    } catch (exception){
+      console.log(exception);
+    }
   };
 
   const checkAlter = () => {
     emailRegEx.test(info.email)
+    setResistable(false);
 
-    if(info.email === '' || info.password === '' || info.passwordValidator === '' || info.name === ''){
+    if(info.email === '' || info.password === '' || info.passwordValidator === '' || info.nickname === ''){
       changeAlter('error', ALTER_ERROR_NOT_INPUT_ALL_INFOMATION)
       return;
     }
@@ -66,7 +78,7 @@ const UserRegister = () => {
     }
 
     changeAlter('success', ALTER_SUCCESS);
-
+    setResistable(true);
   }
 
   const changeAlter = (newSeverity, newMessage) => {
@@ -103,11 +115,11 @@ const UserRegister = () => {
 
         <CustomTypography sx={{margin: '0px 15px 0px auto', display: 'inline'}}>별명</CustomTypography>
         <CustomButtonWhite size='small' sx={{color: 'var(--color1)', backgroundColor: 'var(--color3)', ":hover": {boardColor: 'var(--color1)'}}}>중복검사</CustomButtonWhite>
-        <CustomTextField name='name' onChange={onChangeInfo}/>
+        <CustomTextField name='nickname' onChange={onChangeInfo}/>
 
         <Alert severity={alter.severity}>{alter.message}</Alert>
 
-        {resistable ? (<CustomButtonWhite onClick={onClickRegister}>회원가입</CustomButtonWhite>) : <CustomButton disabled>회원가입</CustomButton>}
+        {resistable ? (<CustomButtonWhite onClick={onClickRegister}>회원가입</CustomButtonWhite>) : <CustomButtonWhite disabled>회원가입</CustomButtonWhite>}
       </CustomBox>
     </Contants>
   );
