@@ -6,6 +6,7 @@ import { CustomTextField } from "../../component/ui/textField/CustomTextField";
 import CustomTypography from "../../component/ui/typography/CustomTypography";
 import { Alert, typographyClasses } from "@mui/material";
 import { axiosInstance } from "../../utils/axios";
+import { useNavigate } from "react-router-dom";
 
 const ALTER_ERROR_NOT_INPUT_ALL_INFOMATION = '모든 정보를 입력해주세요.';
 const ALTER_ERROR_NOT_MACHING_PASSWORD = '패스워드가 일치하지 않습니다.';
@@ -17,6 +18,8 @@ const ALTER_SUCCESS = '회원가입을 진행해주세요';
 const emailRegEx = /^[A-Za-z0-9]([-_.]?[A-Za-z0-9])*@[A-Za-z0-9]([-_.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$/;
 
 const UserRegister = () => {
+
+  const navigate = useNavigate();
 
   const [alter, setAlter] = useState({
     severity: 'error',
@@ -41,13 +44,18 @@ const UserRegister = () => {
 
   const onClickRegister = async () => {
     try{
-      const response = await axiosInstance.post('/users', {
+      await axiosInstance.post('/users', {
           email: info.email,
           password: info.password,
           nickname: info.nickname
         }
       );
-      console.log(response.data);
+
+      navigate('/email-validation', {
+        state: {
+          email: info.email
+        }
+      });
     } catch (exception){
       console.log(exception);
     }
