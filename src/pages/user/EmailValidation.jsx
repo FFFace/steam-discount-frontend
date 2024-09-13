@@ -1,47 +1,114 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Contants from "../../component/Contants";
 import { CustomBox } from "../../component/ui/box/CustomBox";
-import { CustomButtonWhite } from "../../component/ui/button/CustomButton";
+import { CustomButton, CustomButtonWhite } from "../../component/ui/button/CustomButton";
 import { CustomTextField } from "../../component/ui/textField/CustomTextField";
 import CustomTypography from "../../component/ui/typography/CustomTypography";
 import { axiosInstance } from "../../utils/axios";
 import { useState } from "react";
+import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import Loading from "../../component/ui/loading/Loading";
 
 
 const EmailValidation = () => {
 
   const location = useLocation();
+  const navigate = useNavigate();
   const verifyEmail = location.state.email;
   const [verifyCode, setVerifyCode] = useState('');
+  const [verifyDialogOpen, setVerifyDialogOpen] = useState({
+    success: false,
+    fail: false,
+  });
+  const [loading, setLoading] = useState(false);
 
   const onClickVerify = async () => {
-    console.log(verifyEmail, verifyCode);
+
+    setLoading(true);
+
     try{
       const response = await axiosInstance.post('/users/verify', {
         email: verifyEmail,
         code: verifyCode,
       }
-    );
+    )
 
     if(response.data){
-      
-
-      navigator('/login');
+      setVerifyDialogOpen({
+        success: true,
+        fail: false
+      })
     } else {
-
+      setVerifyDialogOpen({
+        success: false,
+        fail: true
+      })
     }
 
     } catch (exception){ 
       console.log(exception);
     }
+
+    setLoading(false);
   }
 
   const onChangeCode = (e) => {
     setVerifyCode(e.target.value);
-  } 
+  }
+
+  const onClickAccept = () => {
+    setVerifyDialogOpen({
+      success: false,
+      fail: false
+    })
+  }
+
+  const onClickAcceptAtSuccess = () => {
+    onClickAccept();
+    navigate('/login');
+  }
+
+  const VerifyFailDialog = () => {
+    return (
+      <Dialog sx={{'& .MuiPaper-root': {
+        backgroundColor: 'var(--color1)'
+      }}} open={verifyDialogOpen.fail}>
+        <DialogTitle sx={{color: 'var(--color4)'}}>인증 실패</DialogTitle>
+        <DialogContent sx={{color: 'var(--color4)'}}>
+          인증 코드가 일치하지 않습니다.<br/>
+          인증 코드를 다시 한 번 입력해주세요.
+        </DialogContent>
+        <DialogActions>
+          <CustomButton onClick={onClickAccept}>
+            확인
+          </CustomButton>
+        </DialogActions>        
+      </Dialog>
+    )
+  }
+
+  const VerifySuccessDialog = () => {
+    return (
+      <Dialog sx={{'& .MuiPaper-root': {
+        backgroundColor: 'var(--color1)'
+      }}} open={verifyDialogOpen.success}>
+        <DialogTitle sx={{color: 'var(--color4)'}}>인증 성공</DialogTitle>
+        <DialogContent sx={{color: 'var(--color4)'}}>
+          감사합니다. 회원가입이 완료되었습니다.<br/>
+          로그인 화면으로 이동합니다.
+        </DialogContent>
+        <DialogActions>
+          <CustomButton onClick={onClickAcceptAtSuccess}>
+            확인
+          </CustomButton>
+        </DialogActions>        
+      </Dialog>
+    )
+  }
 
   return (
     <Contants>
+      <Loading open={loading} />
       <CustomBox>
         <CustomTypography variant='h5'>
           이메일 인증
@@ -58,9 +125,11 @@ const EmailValidation = () => {
         <CustomTextField onChange={onChangeCode}/>
         <CustomButtonWhite onClick={onClickVerify}>인증</CustomButtonWhite>
       </CustomBox>
+      <VerifyFailDialog/>
+      <VerifySuccessDialog/>
     </Contants>
-  );
-};
+  )
+}
 
 
 export default EmailValidation;
