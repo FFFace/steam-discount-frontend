@@ -7,6 +7,7 @@ import CustomTypography from "../../component/ui/typography/CustomTypography";
 import { Alert, typographyClasses } from "@mui/material";
 import { axiosInstance } from "../../utils/axios";
 import { useNavigate } from "react-router-dom";
+import Loading from "../../component/ui/loading/Loading";
 
 const ALTER_ERROR_NOT_INPUT_ALL_INFOMATION = '모든 정보를 입력해주세요.';
 const ALTER_ERROR_NOT_MACHING_PASSWORD = '패스워드가 일치하지 않습니다.';
@@ -20,6 +21,7 @@ const emailRegEx = /^[A-Za-z0-9]([-_.]?[A-Za-z0-9])*@[A-Za-z0-9]([-_.]?[A-Za-z0-
 const UserRegister = () => {
 
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
   const [alter, setAlter] = useState({
     severity: 'error',
@@ -43,6 +45,8 @@ const UserRegister = () => {
   };
 
   const onClickRegister = async () => {
+    setLoading(true);
+
     try{
       await axiosInstance.post('/users', {
           email: info.email,
@@ -59,6 +63,8 @@ const UserRegister = () => {
     } catch (exception){
       console.log(exception);
     }
+
+    setLoading(false);
   };
 
   const checkAlter = () => {
@@ -102,6 +108,7 @@ const UserRegister = () => {
 
   return (
     <Contants>
+      <Loading open={loading} />
       <CustomBox>
         <CustomTypography variant='h5'>
           회원 가입

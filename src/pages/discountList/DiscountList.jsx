@@ -5,6 +5,7 @@ import { axiosInstance } from '../../utils/axios';
 import CustomTypography from '../../component/ui/typography/CustomTypography'
 import styled from "styled-components";
 import { CustomBox } from "../../component/ui/box/CustomBox";
+import Loading from "../../component/ui/loading/Loading";
 
 
 
@@ -15,6 +16,7 @@ const Link = styled.a`
 const DiscountList = () => {
 
   const [discountList, setDiscountList] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const DiscountListComponent = () =>{    
     return discountList.map(discount =>(
@@ -35,6 +37,7 @@ const DiscountList = () => {
   }
 
   useEffect(()=>{
+    setLoading(true);
     const getDiscountList = async () =>{
       try{
         const response = await axiosInstance.get('/discount-list');
@@ -43,12 +46,15 @@ const DiscountList = () => {
       } catch (exception){
         console.log(exception);
       }
+
+      setLoading(false);
     }
     getDiscountList();
   }, []);
 
   return(
     <Contants>
+      <Loading open={loading} />
       <CustomBox>
         <Box sx={{padding: '10px'}}>
           <CustomTypography variant='h5'>
