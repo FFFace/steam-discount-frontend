@@ -6,6 +6,7 @@ import CustomTypography from "../../component/ui/typography/CustomTypography";
 import { CustomTextField } from "../../component/ui/textField/CustomTextField";
 import {CustomButton} from "../../component/ui/button/CustomButton";
 import { useNavigate } from "react-router-dom";
+import { axiosInstance } from "../../utils/axios";
 
 const Login = () => {
 
@@ -23,7 +24,7 @@ const Login = () => {
     });
   }
 
-  const onClickRegister = (e) => {
+  const onClickRegister = () => {
     navigate('/user-register');
   }
 
@@ -33,6 +34,18 @@ const Login = () => {
         {props.children}
       </CustomButton>
     )
+  }
+
+  const onClickLoginButton = async () => {
+    try{
+      await axiosInstance.post(`/users/login`, {
+        email: info.email,
+        password: info.password
+      });
+
+    } catch(exception){
+      console.log(exception);
+    }
   }
 
   return (

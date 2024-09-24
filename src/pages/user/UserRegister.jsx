@@ -12,7 +12,19 @@ import Loading from "../../component/ui/loading/Loading";
 const ALTER_ERROR_NOT_INPUT_ALL_INFOMATION = '모든 정보를 입력해주세요.';
 const ALTER_ERROR_NOT_MACHING_PASSWORD = '패스워드가 일치하지 않습니다.';
 const ALTER_ERROR_WRONG_EMAIL = '이메일 형식이 잘못되었습니다.';
-const ALTER_ERROR_TOO_SHORT_PASSWORD = '패스워드를 8자 이상 입력해주세요';
+const ALTER_ERROR_TOO_SHORT_PASSWORD = '패스워드를 8자 이상 입력해주세요.';
+const ALTER_ERROR_NEED_EMAIL_CHECK_DUPLICATE = '이메일 중복검사를 진행하지 않았습니다.';
+const ALTER_ERROR_NEED_NICKNAME_CHECK_DUPALICATE = '별명 중복검사를 진행하지 않았습니다.';
+const ALTER_ERROR_EMAIL_DUPLICATE_FAIL = '이미 사용중인 이메일 입니다.';
+const ALTER_ERROR_NICKNAME_DUPLICATE_FAIL = '이미 사용중인 별명 입니다.';
+
+const TYPOGRAPHY_NEED_DUPLICATE_EMAIL = '이메일 중복검사가 필요합니다.';
+const TYPOGRAPHY_FAIL_DUPLICATE_EMAIL = '이미 사용중인 이메일 입니다.';
+const TYPOGRAPHY_DUPLICATE_EMAIL = '사용할 수 있는 이메일 입니다.';
+
+const TYPOGRAPHY_NEED_DUPLICATE_NICKNAME = '별명 중복검사가 필요합니다.';
+const TYPOGRAPHY_FAIL_DUPLICATE_NICKNAME = '이미 사용중인 별명 입니다.';
+const TYPOGRAPHY_DUPLICATE_NICKNAME = '사용할 수 있는 이메일 입니다.';
 
 const ALTER_SUCCESS = '회원가입을 진행해주세요';
 
@@ -28,6 +40,11 @@ const UserRegister = () => {
     message: ALTER_ERROR_NOT_INPUT_ALL_INFOMATION
   });
 
+  const [duplicateInfo, setDuplicateInfo] = useState({
+    email: TYPOGRAPHY_NEED_DUPLICATE_EMAIL,
+    nickname: TYPOGRAPHY_NEED_DUPLICATE_NICKNAME
+  });
+
   const [info, setInfo] = useState({
     email: '',
     password: '',
@@ -36,6 +53,16 @@ const UserRegister = () => {
   });
 
   const [resistable, setResistable] = useState(false);
+
+  const [duplicateCheck, setDuplicateCheck] = useState({
+    email: false,
+    nickname: false
+  });
+
+  const [duplicate, setDuplicate] = useState({
+    email: false,
+    nickname: false,
+  })
 
   const onChangeInfo = (e) => {
     setInfo({
@@ -81,6 +108,16 @@ const UserRegister = () => {
       return;
     }
 
+    if(!duplicateCheck.email){
+      changeAlter('error', ALTER_ERROR_NEED_EMAIL_CHECK_DUPLICATE);
+      return;
+    }
+
+    if(!duplicate.email){
+      changeAlter('error', ALTER_ERROR_EMAIL_DUPLICATE_FAIL);
+      return;
+    }
+
     if(info.password.length < 8){
       changeAlter('error', ALTER_ERROR_TOO_SHORT_PASSWORD);
       return;
@@ -88,6 +125,16 @@ const UserRegister = () => {
 
     if(info.password !== info.passwordValidator){
       changeAlter('error', ALTER_ERROR_NOT_MACHING_PASSWORD)
+      return;
+    }
+
+    if(!duplicateCheck.nickname){
+      changeAlter('error', ALTER_ERROR_NEED_NICKNAME_CHECK_DUPALICATE);
+      return;
+    }
+
+    if(!duplicate.nickname){
+      changeAlter('error', ALTER_ERROR_NICKNAME_DUPLICATE_FAIL);
       return;
     }
 
@@ -106,6 +153,50 @@ const UserRegister = () => {
     checkAlter();
   }, [info]);
 
+  const onClickDuplicateEmail = async () => {
+    try{
+      if(info.email === '')
+        return;
+
+      const response = await axiosInstance.post(`/users/duplicate-email`, {
+        email: info.email
+      });
+
+      duplicate.email = response.data;
+      duplicateCheck.email = response.data;
+
+      setDuplicateInfo({
+        ...duplicateInfo,
+        email: response.data ? TYPOGRAPHY_DUPLICATE_EMAIL : TYPOGRAPHY_FAIL_DUPLICATE_EMAIL
+      })
+
+    } catch(exception){
+      console.log(exception);
+    }
+  }
+
+  const onClickDuplicateNickname = async () => {
+    try{
+      if(info.nickname === '')
+        return;
+      
+      const response = await axiosInstance.post(`/users/duplicate-nickname`, {
+        nickname: info.nickname
+      });
+
+      duplicate.nickname = response.data;
+      duplicateCheck.nickname = response.data;
+
+      setDuplicateInfo({
+        ...duplicateInfo,
+        nickname: response.data ? TYPOGRAPHY_DUPLICATE_NICKNAME : TYPOGRAPHY_FAIL_DUPLICATE_NICKNAME
+      });
+
+    } catch(exception){
+      console.log(exception);
+    }
+  }
+
   return (
     <Contants>
       <Loading open={loading} />
@@ -119,7 +210,8 @@ const UserRegister = () => {
       </CustomBox>
       <CustomBox>
         <CustomTypography sx={{margin: '0px 15px 0px auto', display: 'inline'}}>이메일</CustomTypography>
-        <CustomButtonWhite size='small' sx={{color: 'var(--color1)', backgroundColor: 'var(--color3)', ":hover": {boardColor: 'var(--color1)'}}}>중복검사</CustomButtonWhite>
+        <CustomButtonWhite size='small' sx={{display: 'inline', color: 'var(--color1)', backgroundColor: 'var(--color3)', ":hover": {boardColor: 'var(--color1)'}}} onClick={onClickDuplicateEmail}>중복검사</CustomButtonWhite>
+        <CustomTypography sx={{margin: '0px 0px 0px 10px', display: 'inline'}}>{duplicateInfo.email}</CustomTypography>
         <CustomTextField name='email' onChange={onChangeInfo}/>
 
         <CustomTypography >비밀번호</CustomTypography>
@@ -129,7 +221,8 @@ const UserRegister = () => {
         <CustomTextField name='passwordValidator' onChange={onChangeInfo}/>
 
         <CustomTypography sx={{margin: '0px 15px 0px auto', display: 'inline'}}>별명</CustomTypography>
-        <CustomButtonWhite size='small' sx={{color: 'var(--color1)', backgroundColor: 'var(--color3)', ":hover": {boardColor: 'var(--color1)'}}}>중복검사</CustomButtonWhite>
+        <CustomButtonWhite size='small' sx={{color: 'var(--color1)', backgroundColor: 'var(--color3)', ":hover": {boardColor: 'var(--color1)'}}} onClick={onClickDuplicateNickname}>중복검사</CustomButtonWhite>
+        <CustomTypography sx={{margin: '0px 0px 0px 10px', display: 'inline'}}>{duplicateInfo.nickname}</CustomTypography>
         <CustomTextField name='nickname' onChange={onChangeInfo}/>
 
         <Alert severity={alter.severity}>{alter.message}</Alert>
