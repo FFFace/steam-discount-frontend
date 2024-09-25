@@ -1,16 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Contants from "../../component/Contants"
-import { Box, Button, TextField } from "@mui/material";
+import { Box, DialogActions, DialogTitle} from "@mui/material";
 import { CustomBox } from "../../component/ui/box/CustomBox";
 import CustomTypography from "../../component/ui/typography/CustomTypography";
 import { CustomTextField } from "../../component/ui/textField/CustomTextField";
 import {CustomButton} from "../../component/ui/button/CustomButton";
 import { useNavigate } from "react-router-dom";
 import { axiosInstance } from "../../utils/axios";
+import { setLoginState, saveAccessToken } from "../../utils/storage";
+import { CustomDialog, CustomDialogContent, CustomDialogTitle } from "../../component/ui/dialog/CustomDialog";
+import Loading from "../../component/ui/loading/Loading";
 
 const Login = () => {
 
   const navigate = useNavigate();
+
+  const [isLogin, setIsLogin] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [info, setInfo] = useState({
     email: '',
@@ -37,19 +43,49 @@ const Login = () => {
   }
 
   const onClickLoginButton = async () => {
+    setLoading(true);
     try{
-      await axiosInstance.post(`/users/login`, {
+      const response = await axiosInstance.post(`/users/login`, {
         email: info.email,
         password: info.password
       });
 
+      saveAccessToken(response.headers['authorization']);
+      setIsLogin(true);
+
     } catch(exception){
       console.log(exception);
     }
+
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    setLoginState(true);
+  }, [isLogin])
+
+  const LoginSuccess = () => {
+    return(
+      <CustomDialog open={isLogin}>
+        <CustomDialogTitle>로그인 성공</CustomDialogTitle>
+        <CustomDialogContent>
+          로그인되었습니다.<br/>
+          타이틀로 돌아갑니다.<br/>
+        </CustomDialogContent>
+        <DialogActions>
+          <CustomButton onClick={onClickLoginSuccess}>확인</CustomButton>
+        </DialogActions>
+      </CustomDialog>
+    );
+  }
+
+  const onClickLoginSuccess = () => {
+    navigate('/');
   }
 
   return (
     <Contants>
+      <Loading open={loading} />
       <CustomBox>
         <CustomTypography variant='h5'>
           로그인
@@ -66,8 +102,8 @@ const Login = () => {
         <CustomTypography sx={{margin: '5px'}} >비밀번호</CustomTypography>
         <CustomTextField name='password' onChange={onChangeInfo} value={info.password}/>
 
-        <Box sx={{margin: '25px 0px auto'}}>
-          <ButtonComponent>
+        <Box sx={{margin: '25px 0px auto'}} onClick={onClickLoginButton}>
+          <ButtonComponent onClick={onClickLoginButton}>
             로그인
           </ButtonComponent>
           <ButtonComponent onClick={onClickRegister}>
@@ -75,6 +111,7 @@ const Login = () => {
           </ButtonComponent>
         </Box>
       </CustomBox>
+      <LoginSuccess/>
     </Contants>
   );
 };
