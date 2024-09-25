@@ -1,14 +1,19 @@
 import { Typography, Box, Container, Button } from '@mui/material';
 import {CustomButton} from './ui/button/CustomButton';
 import { useNavigate } from 'react-router-dom';
-import { setLoginState, loginState, logout } from '../utils/storage';
+import { setLoginState, loginState } from '../utils/storage';
 import { useEffect, useState } from 'react';
 import CustomTypography from './ui/typography/CustomTypography';
+import { useRecoilState } from 'recoil';
+import { userState } from '../utils/atom';
+import { axiosInstance } from '../utils/axios';
+import Loading from './ui/loading/Loading';
 
 const Header = () =>{
 
   const navigate = useNavigate();
-  const [isLogin, setIsLogin] = useState(false);
+  const [state, setState] = useRecoilState(userState);
+  const [loading, setLoading] = useState(false);
 
   const onClickDiscountList = () =>{
     navigate('/discount-list');
@@ -18,19 +23,21 @@ const Header = () =>{
     navigate('/login');
   }
 
-  const onClickLogout = () => {
-    setIsLogin(false);
+  const onClickLogout = async () => {
+    setLoading(true);
+    try{
+      await axiosInstance.post(`/logout`);
+
+    } catch(exception){
+      console.log(exception);
+    }
+
+    setState({
+      ...state,
+      isLoggedIn: false
+    })
+    setLoading(false);
   }
-
-  useEffect(() => {
-    setIsLogin(loginState);
-    console.log(isLogin, loginState);
-  }, [loginState]);
-
-  useEffect(() => {
-    if(!isLogin)
-      setLoginState(false);
-  }, [isLogin])
 
   const LoginButton = () => {
     return (
@@ -64,8 +71,9 @@ const Header = () =>{
         <CustomButton>
           커뮤니티
         </CustomButton>
-        {isLogin ? <LogoutButton/> : <LoginButton/>}
+        {state.isLoggedIn ? <LogoutButton/> : <LoginButton/>}
       </Box>  
+      <Loading open={loading}/>
     </Box>
   )
 }
