@@ -8,6 +8,7 @@ import { axiosInstance } from "../../utils/axios";
 import { useState } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import Loading from "../../component/ui/loading/Loading";
+import { CustomDialog, CustomDialogContent, CustomDialogTitle } from "../../component/ui/dialog/CustomDialog";
 
 
 const EmailValidation = () => {
@@ -70,20 +71,18 @@ const EmailValidation = () => {
 
   const VerifyFailDialog = () => {
     return (
-      <Dialog sx={{'& .MuiPaper-root': {
-        backgroundColor: 'var(--color1)'
-      }}} open={verifyDialogOpen.fail}>
-        <DialogTitle sx={{color: 'var(--color4)'}}>인증 실패</DialogTitle>
-        <DialogContent sx={{color: 'var(--color4)'}}>
+      <CustomDialog open={verifyDialogOpen.fail}>
+        <CustomDialogTitle >인증 실패</CustomDialogTitle>
+        <CustomDialogContent >
           인증 코드가 일치하지 않습니다.<br/>
           인증 코드를 다시 한 번 입력해주세요.
-        </DialogContent>
+        </CustomDialogContent>
         <DialogActions>
           <CustomButton onClick={onClickAccept}>
             확인
           </CustomButton>
         </DialogActions>        
-      </Dialog>
+      </CustomDialog>
     )
   }
 
@@ -92,11 +91,11 @@ const EmailValidation = () => {
       <Dialog sx={{'& .MuiPaper-root': {
         backgroundColor: 'var(--color1)'
       }}} open={verifyDialogOpen.success}>
-        <DialogTitle sx={{color: 'var(--color4)'}}>인증 성공</DialogTitle>
-        <DialogContent sx={{color: 'var(--color4)'}}>
+        <CustomDialogTitle>인증 성공</CustomDialogTitle>
+        <CustomDialogContent>
           감사합니다. 회원가입이 완료되었습니다.<br/>
           로그인 화면으로 이동합니다.
-        </DialogContent>
+        </CustomDialogContent>
         <DialogActions>
           <CustomButton onClick={onClickAcceptAtSuccess}>
             확인
