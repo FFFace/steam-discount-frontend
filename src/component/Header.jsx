@@ -1,10 +1,14 @@
 import { Typography, Box, Container, Button } from '@mui/material';
 import {CustomButton} from './ui/button/CustomButton';
 import { useNavigate } from 'react-router-dom';
+import { setLoginState, loginState, logout } from '../utils/storage';
+import { useEffect, useState } from 'react';
+import CustomTypography from './ui/typography/CustomTypography';
 
 const Header = () =>{
 
   const navigate = useNavigate();
+  const [isLogin, setIsLogin] = useState(false);
 
   const onClickDiscountList = () =>{
     navigate('/discount-list');
@@ -12,6 +16,40 @@ const Header = () =>{
 
   const onClickLogin = () => {
     navigate('/login');
+  }
+
+  const onClickLogout = () => {
+    setIsLogin(false);
+  }
+
+  useEffect(() => {
+    setIsLogin(loginState);
+    console.log(isLogin, loginState);
+  }, [loginState]);
+
+  useEffect(() => {
+    if(!isLogin)
+      setLoginState(false);
+  }, [isLogin])
+
+  const LoginButton = () => {
+    return (
+      <Box sx={{float:'right'}}>
+        <CustomButton onClick={onClickLogin}>
+          로그인
+        </CustomButton>
+      </Box>
+    );
+  }
+
+  const LogoutButton = () => {
+    return (
+      <Box sx={{float:'right'}}>
+        <CustomButton onClick={onClickLogout}>
+          로그아웃
+        </CustomButton>
+      </Box>
+    )
   }
 
   return(
@@ -26,11 +64,7 @@ const Header = () =>{
         <CustomButton>
           커뮤니티
         </CustomButton>
-        <Box sx={{float:'right'}}>
-          <CustomButton onClick={onClickLogin}>
-            로그인
-          </CustomButton>
-        </Box>
+        {isLogin ? <LogoutButton/> : <LoginButton/>}
       </Box>  
     </Box>
   )
