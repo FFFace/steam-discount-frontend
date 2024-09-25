@@ -151,7 +151,7 @@ const UserRegister = () => {
 
   useEffect(() => {
     checkAlter();
-  }, [info]);
+  }, [info, duplicate, duplicateCheck, duplicateInfo]);
 
   const onClickDuplicateEmail = async () => {
     try{
@@ -162,13 +162,22 @@ const UserRegister = () => {
         email: info.email
       });
 
-      duplicate.email = response.data;
-      duplicateCheck.email = response.data;
+      setDuplicate({
+        ...duplicate,
+        email: response.data
+      });
+
+      setDuplicateCheck({
+        ...duplicateCheck,
+        email: response.data
+      });
 
       setDuplicateInfo({
         ...duplicateInfo,
         email: response.data ? TYPOGRAPHY_DUPLICATE_EMAIL : TYPOGRAPHY_FAIL_DUPLICATE_EMAIL
       })
+
+      console.log(duplicate, duplicateCheck, duplicateInfo);
 
     } catch(exception){
       console.log(exception);
@@ -179,13 +188,20 @@ const UserRegister = () => {
     try{
       if(info.nickname === '')
         return;
-      
+
       const response = await axiosInstance.post(`/users/duplicate-nickname`, {
         nickname: info.nickname
       });
 
-      duplicate.nickname = response.data;
-      duplicateCheck.nickname = response.data;
+      setDuplicate({
+        ...duplicate,
+        nickname: response.data
+      });
+
+      setDuplicateCheck({
+        ...duplicateCheck,
+        nickname: response.data
+      });
 
       setDuplicateInfo({
         ...duplicateInfo,
