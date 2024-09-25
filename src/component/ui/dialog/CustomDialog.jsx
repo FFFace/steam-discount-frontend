@@ -15,6 +15,12 @@ export const CustomDialogTitle = (props) => {
   )
 }
 
+export const CustomDialogErrorTitle = (props) => {
+  return(
+    <DialogTitle sx={{color: 'red'}} {...props}>{props.children}</DialogTitle>
+  )
+}
+
 export const CustomDialogContent = (props) => {
   return(
     <DialogContent sx={{color: 'var(--color4)'}} {...props}>{props.children}</DialogContent>
