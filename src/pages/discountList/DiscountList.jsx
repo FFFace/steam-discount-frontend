@@ -42,7 +42,6 @@ const DiscountList = () => {
       try{
         const response = await axiosInstance.get('/discount-list');
         setDiscountList(response.data);
-        console.log(discountList);
       } catch (exception){
         console.log(exception);
       }
