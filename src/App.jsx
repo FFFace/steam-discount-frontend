@@ -3,15 +3,16 @@ import './App.css';
 import Header from './component/Header';
 import Contants from './component/Contants';
 import { Button, ThemeProvider, Typography, createTheme } from '@mui/material';
+import { RecoilRoot } from 'recoil';
 
 
 function App() {
   return (
-      <Contants>  
-        <Typography>
-          MUI Body
-        </Typography>
-      </Contants>
+    <Contants>  
+      <Typography>
+        MUI Body
+      </Typography>  
+    </Contants>
   );
 }
 

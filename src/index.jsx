@@ -10,6 +10,7 @@ import Login from './pages/user/Login'
 import { createTheme, ThemeProvider } from '@mui/material';
 import UserRegister from './pages/user/UserRegister';
 import EmailValidation from './pages/user/EmailValidation';
+import { RecoilRoot } from 'recoil';
 
 const theme = createTheme({
   typography: {
@@ -43,7 +44,9 @@ const bodyRouter = createBrowserRouter([
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <ThemeProvider theme={theme}>
-    <RouterProvider router={bodyRouter}/>
+    <RecoilRoot>
+      <RouterProvider router={bodyRouter}/>
+    </RecoilRoot>    
   </ThemeProvider>  
 );
 
