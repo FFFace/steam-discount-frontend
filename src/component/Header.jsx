@@ -35,7 +35,9 @@ const Header = () =>{
     setState({
       ...state,
       isLoggedIn: false
-    })
+    });
+    localStorage.removeItem('token');
+    
     setLoading(false);
   }
 
