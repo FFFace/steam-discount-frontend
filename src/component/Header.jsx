@@ -32,12 +32,12 @@ const Header = () =>{
       console.log(exception);
     }
 
+    localStorage.removeItem('token');
     setState({
       ...state,
       isLoggedIn: false
-    });
-    localStorage.removeItem('token');
-    
+    })
+
     setLoading(false);
   }
 
