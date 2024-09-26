@@ -138,7 +138,7 @@ const Login = () => {
         <CustomTypography sx={{margin: '5px'}} >이메일</CustomTypography>
         <CustomTextField name='email' onChange={onChangeInfo} value={info.email}/>
         <CustomTypography sx={{margin: '5px'}} >비밀번호</CustomTypography>
-        <CustomTextField name='password' onChange={onChangeInfo} value={info.password}/>
+        <CustomTextField type='password' name='password' onChange={onChangeInfo} value={info.password}/>
 
         <Box sx={{margin: '25px 0px auto'}}>
           <ButtonComponent onClick={onClickLoginButton}>

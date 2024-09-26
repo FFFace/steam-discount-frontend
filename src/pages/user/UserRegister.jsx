@@ -231,10 +231,10 @@ const UserRegister = () => {
         <CustomTextField name='email' onChange={onChangeInfo}/>
 
         <CustomTypography >비밀번호</CustomTypography>
-        <CustomTextField name='password' onChange={onChangeInfo}/>
+        <CustomTextField type='password' name='password' onChange={onChangeInfo}/>
 
         <CustomTypography>비밀번호 확인</CustomTypography>
-        <CustomTextField name='passwordValidator' onChange={onChangeInfo}/>
+        <CustomTextField type='password' name='passwordValidator' onChange={onChangeInfo}/>
 
         <CustomTypography sx={{margin: '0px 15px 0px auto', display: 'inline'}}>별명</CustomTypography>
         <CustomButtonWhite size='small' sx={{color: 'var(--color1)', backgroundColor: 'var(--color3)', ":hover": {boardColor: 'var(--color1)'}}} onClick={onClickDuplicateNickname}>중복검사</CustomButtonWhite>
