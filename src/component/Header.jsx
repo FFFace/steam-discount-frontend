@@ -32,7 +32,6 @@ const Header = () =>{
       console.log(exception);
     }
 
-    localStorage.removeItem('token');
     setState({
       ...state,
       isLoggedIn: false
@@ -61,9 +60,16 @@ const Header = () =>{
     )
   }
 
+  const onClickMainButton = () => {
+    navigate('/');
+  }
+
   return(
     <Box sx={{display: 'block', margin: '30px 0px 30px 0px'}}>
       <Box sx={{backgroundColor: 'var(--color2)',}}>
+        <CustomButton onClick={onClickMainButton}>
+          메인
+        </CustomButton>
         <CustomButton onClick={onClickDiscountList}>
           할인 목록
         </CustomButton>
