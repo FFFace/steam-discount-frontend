@@ -11,6 +11,7 @@ import { createTheme, ThemeProvider } from '@mui/material';
 import UserRegister from './pages/user/UserRegister';
 import EmailValidation from './pages/user/EmailValidation';
 import { RecoilRoot } from 'recoil';
+import Main from './pages/main/main';
 
 const theme = createTheme({
   typography: {
@@ -21,7 +22,7 @@ const theme = createTheme({
 const bodyRouter = createBrowserRouter([
   {
     path: '/',
-    element: <App/>
+    element: <Main/>
   },
   {
     path: '/discount-list',
