@@ -53,7 +53,6 @@ const DiscountList = () => {
 
   return(
     <Contants>
-      <Loading open={loading} />
       <CustomBox>
         <Box sx={{padding: '10px'}}>
           <CustomTypography variant='h5'>
@@ -62,6 +61,7 @@ const DiscountList = () => {
         </Box>
       </CustomBox>
       {discountList ? <DiscountListComponent/> : <></>}
+      <Loading open={loading} />
     </Contants>
   );
 };
