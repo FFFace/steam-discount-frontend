@@ -125,9 +125,11 @@ const Login = () => {
   return (
     <Contants>
       <CustomBox>
-        <CustomTypography variant='h5'>
-          로그인
-        </CustomTypography>
+        <Box sx={{padding: '10px'}}>
+          <CustomTypography variant='h5'>
+            로그인
+          </CustomTypography>
+        </Box>       
       </CustomBox>
       <CustomBox>
         {/* <TextField label='ID' sx={{display: 'flex', 
