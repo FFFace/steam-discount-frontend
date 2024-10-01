@@ -11,10 +11,13 @@ import { ArrowRight } from "@mui/icons-material";
 import { userState } from "../../utils/atom";
 import { useRecoilState } from "recoil";
 import { saveAccessToken } from "../../utils/storage";
+import { useNavigate } from "react-router-dom";
 
 const DISCOUNT_SAMPLE_MAX_COUNT = 4;
 
 const Main = () => {
+
+  const navigate = useNavigate();
 
   const [discountList, setDiscountList] = useState();
   const [loading, setLoading] = useState(false);
@@ -105,6 +108,10 @@ const Main = () => {
     )
   }
 
+  const onClickMoreDiscoutList = () => {
+    navigate('/discount-list');
+  }
+
   return(
     <Contants>
       <CustomBox>
@@ -130,7 +137,7 @@ const Main = () => {
         <CustomButton sx={{ color: 'var(--color4)',":hover": {
           background: 'var(--color2)'
           }, 
-          margin: '-40px 0px',float: 'right'}}>
+          margin: '-40px 0px',float: 'right'}} onClick={onClickMoreDiscoutList}>
           할인 더 보기
         </CustomButton>
       </CustomBox>      
