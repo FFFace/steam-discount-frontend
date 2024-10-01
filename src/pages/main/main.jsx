@@ -1,4 +1,4 @@
-import { Box, IconButton } from "@mui/material";
+import { Box, Button, IconButton } from "@mui/material";
 import Contants from "../../component/Contants"
 import { CustomBox } from "../../component/ui/box/CustomBox";
 import CustomTypography from "../../component/ui/typography/CustomTypography";
@@ -8,12 +8,19 @@ import Loading from "../../component/ui/loading/Loading";
 import ArrowLeft from "@mui/icons-material/ArrowLeft";
 import { CustomButton } from "../../component/ui/button/CustomButton";
 import { ArrowRight } from "@mui/icons-material";
+import { userState } from "../../utils/atom";
+import { useRecoilState } from "recoil";
+import { saveAccessToken } from "../../utils/storage";
+
+const DISCOUNT_SAMPLE_MAX_COUNT = 4;
 
 const Main = () => {
 
   const [discountList, setDiscountList] = useState();
   const [loading, setLoading] = useState(false);
   const [itemNum, setItemNum] = useState(0);
+
+  const [state, setState] = useRecoilState(userState);
 
   useEffect(() => {
     const getRandomDiscountFive = async () => {
@@ -30,38 +37,69 @@ const Main = () => {
       setLoading(false);
     }
 
+    const pageOpen = async () => {
+      try{
+        const response = await axiosInstance.get(`/token-check`)
+  
+        saveAccessToken(response.headers['authorization']);
+        setState({
+          ...state,
+          isLoggedIn: true
+        });
+      } catch(exception){
+        console.log(exception);
+
+        setState({
+          ...state,
+          isLoggedIn: false
+        });
+      }
+    }
+
+    pageOpen();
     getRandomDiscountFive();
   }, [])
 
-  const ButtonComponent = ({...props}) => {
-    return(
-      <CustomButton sx={{width: '45%', margin: '10px 0px auto', color: 'var(--color1)', fontWeight: 'bold', backgroundColor: 'var(--color3)', border: 'solid 1px var(--color1)', ":hover": {borderColor: 'var(--color1)'}}} {...props}>
-        {props.children}
-      </CustomButton>
+  const onClickDiscountRightButton = () => {
+    if(itemNum >= DISCOUNT_SAMPLE_MAX_COUNT){
+      setItemNum(0);
+    } else {
+      setItemNum(itemNum+1);
+    }
+  }
+
+  const onClickDiscountLeftButton = () => {
+    if(itemNum <= 0){
+      setItemNum(DISCOUNT_SAMPLE_MAX_COUNT);
+    } else {
+      setItemNum(itemNum-1);
+    }
+  }
+
+  const DiscountTitle = () => {
+    return (
+      <Box sx={{display: 'flex'}}>
+        <Box sx={{display: 'flex', margin: 'auto'}}>
+          <img src={discountList[itemNum].image}/>   
+          <CustomTypography sx={{margin: '10px 0px 5px 10px', display: 'inline-block'}}>
+            {discountList[itemNum].name}
+          </CustomTypography>          
+        </Box>
+      </Box>
     )
   }
 
-  const DiscountList = () => {
-    return(
-      <Box>
-        <CustomTypography sx={{margin: '10px 0px 5px 0px'}}>
-          {discountList[itemNum].name}
-        </CustomTypography>
-        <img src={discountList[itemNum].image}/>        
-        <Box sx={{float: 'right'}}>
-            <CustomTypography color='gray' sx={{display: 'inline', textDecoration: 'line-through'}}>{discountList[itemNum].originPrice}</CustomTypography>
+  const DiscountPayload = () => {
+    return (
+      <Box sx={{display: 'flex', margin: '20px 0px'}}>
+        <Box sx={{margin: 'auto'}}>
+          <Box sx={{display: 'inline-block'}}>
+            <CustomTypography color='#81F680' sx={{fontSize: '35px', backgroundColor: '#4A610A'}}>{discountList[itemNum].discountPercent}</CustomTypography>
+          </Box>          
+          <Box sx={{height: ' ', margin: '0px 0px 0px 20px', display: 'inline-block'}}> 
+            <CustomTypography color='gray' sx={{textDecoration: 'line-through'}}>{discountList[itemNum].originPrice}</CustomTypography>
             <CustomTypography>{discountList[itemNum].discountPrice}</CustomTypography>
-          </Box>        
-          <Box sx={{margin: '5px 20px 0px', float: 'right'}}>
-            <CustomTypography color='#81F680' sx={{padding: '0px 5px 0px 5px', fontSize: '25px', backgroundColor: '#4A610A'}}>{discountList[itemNum].discountPercent}</CustomTypography>
-        </Box>
-        <Box>
-          <CustomButton sx={{width: '50%', margin: '10px 0px auto', color: 'var(--color1)', fontWeight: 'bold', backgroundColor: 'var(--color3)', border: 'solid 1px var(--color1)', float: 'left'}}>
-            <ArrowLeft fontSize='large' sx={{float: 'left', color: 'var(--color1)'}}/>
-          </CustomButton>
-          <CustomButton sx={{width: '50%', margin: '10px 0px auto', color: 'var(--color1)', fontWeight: 'bold', backgroundColor: 'var(--color3)', border: 'solid 1px var(--color1)', float: 'right'}}>
-            <ArrowRight fontSize='large' sx={{float: 'left', color: 'var(--color1)'}}/>
-          </CustomButton>
+          </Box>          
         </Box>
       </Box>
     )
@@ -74,8 +112,27 @@ const Main = () => {
           지금 할인 중!
         </CustomTypography>
       </CustomBox>      
-      <CustomBox sx={{margin: '15px', padding: '5px', backgroundColor: 'var(--color2)', height: '155px'}}>
-        {discountList ? <DiscountList/> : <></>}
+      <CustomBox sx={{margin: '15px', padding: '5px', backgroundColor: 'var(--color2)'}}>
+        <CustomButton onClick={onClickDiscountLeftButton} sx={{ color: 'var(--color4)',":hover": {
+          background: 'var(--color2)'
+          }, margin: '40px 0px', float: 'left'}}>
+          <ArrowLeft fontSize='large' sx={{color: 'var(--color4)'}}/>
+        </CustomButton>
+        <CustomButton onClick={onClickDiscountRightButton} sx={{ color: 'var(--color4)',":hover": {
+          background: 'var(--color2)'
+          }, margin: '40px 0px', float: 'right'}}>
+          <ArrowRight fontSize='large' sx={{color: 'var(--color4)'}}/>
+        </CustomButton>
+        <Box sx={{margin: '10px 0px'}}>
+          {discountList ? <DiscountTitle/> : <></>}
+          {discountList ? <DiscountPayload/> : <></>}
+        </Box>
+        <CustomButton sx={{ color: 'var(--color4)',":hover": {
+          background: 'var(--color2)'
+          }, 
+          margin: '-40px 0px',float: 'right'}}>
+          할인 더 보기
+        </CustomButton>
       </CustomBox>      
       <Loading open={loading}/>
     </Contants> 

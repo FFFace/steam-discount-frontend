@@ -12,31 +12,6 @@ import { saveAccessToken } from './utils/storage';
 
 function App() {
 
-  const [state, setState] = useRecoilState(userState);
-
-  useEffect(() => {
-    const pageOpen = async () => {
-      try{
-        const response = await axiosInstance.get(`/token-check`)
-  
-        saveAccessToken(response.headers['authorization']);
-        setState({
-          ...state,
-          isLoggedIn: true
-        });
-      } catch(exception){
-        console.log(exception);
-
-        setState({
-          ...state,
-          isLoggedIn: false
-        });
-      }
-    }
-
-    pageOpen();
-  }, []);
-
   return (
     <Contants>  
       <Typography>
