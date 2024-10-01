@@ -116,6 +116,11 @@ const Main = () => {
     <Contants>
       <CustomBox>
         <CustomTypography variant='h5' sx={{padding: '10px'}}>
+          공지사항
+        </CustomTypography>
+      </CustomBox>
+      <CustomBox>
+        <CustomTypography variant='h5' sx={{padding: '10px'}}>
           지금 할인 중!
         </CustomTypography>
       </CustomBox>      

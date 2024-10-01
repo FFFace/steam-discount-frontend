@@ -29,6 +29,7 @@ const TYPOGRAPHY_DUPLICATE_NICKNAME = '사용할 수 있는 이메일 입니다.
 const ALTER_SUCCESS = '회원가입을 진행해주세요';
 
 const emailRegEx = /^[A-Za-z0-9]([-_.]?[A-Za-z0-9])*@[A-Za-z0-9]([-_.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$/;
+const passwordRegEx = /^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}/;
 
 const UserRegister = () => {
 
@@ -118,7 +119,7 @@ const UserRegister = () => {
       return;
     }
 
-    if(info.password.length < 8){
+    if(info.password.length < 8 || !passwordRegEx.test(info.password)){
       changeAlter('error', ALTER_ERROR_TOO_SHORT_PASSWORD);
       return;
     }
