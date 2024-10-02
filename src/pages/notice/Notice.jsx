@@ -1,9 +1,11 @@
-import { Box } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import Contants from "../../component/Contants";
 import { CustomBox } from "../../component/ui/box/CustomBox";
 import CustomTypography from "../../component/ui/typography/CustomTypography";
 import { useEffect, useState } from "react";
 import { axiosInstance } from "../../utils/axios";
+import { Link, useNavigate } from "react-router-dom";
+import { CustomButton } from "../../component/ui/button/CustomButton";
 
 
 const NOTICE_BOARD_NUMBER = 1;
@@ -13,6 +15,8 @@ const Notice = () => {
   const [page, setPage] = useState(0);
   const [totalPage, setTotalPage] = useState(0);
   const [postList, setPostList] = useState(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getNoticeList = async () => {
@@ -26,8 +30,6 @@ const Notice = () => {
         
         setTotalPage(response.data.totalPage);
         setPostList(response.data.postPageResponseDTOList)
-
-        console.log(response.data.postPageResponseDTOList);
       } catch(exception){
         console.log(exception);
       }
@@ -38,7 +40,7 @@ const Notice = () => {
 
   const PostListTypographyTitle = ({children}) => {
     return (
-      <CustomTypography sx={{margin: '0px 0px 0px 5px', display: 'inline-block', width: '70%', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap'}}>
+      <CustomTypography sx={{margin: '0px 0px 0px 5px', display: 'inline-block', width: '60%', textAlign: 'left', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap'}}>
         {children}
       </CustomTypography>
     )
@@ -54,7 +56,7 @@ const Notice = () => {
 
   const PostListTypographyThumbs = ({children}) => {
     return (
-      <CustomTypography sx={{display: 'inline-block', width: '10%', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', textAlign: 'center'}}>
+      <CustomTypography sx={{display: 'inline-block', width: '15%', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', textAlign: 'center'}}>
         {children}
       </CustomTypography>
     )   
@@ -62,15 +64,25 @@ const Notice = () => {
 
   const PostListComponent = () =>{
     return postList.map(post => (
-      <Box sx={{borderBottomStyle: 'solid', borderTopStyle: 'solid', borderWidth: '1px'}}>
-        <PostListTypographyTitle>{post.name}</PostListTypographyTitle>
-        <PostListTypographyWriter>{post.writer}</PostListTypographyWriter>
-        <PostListTypographyThumbs>{post.thumbsUp}</PostListTypographyThumbs>
-      </Box>
+        <Box key={post.id} sx={{borderBottomStyle: 'solid', borderWidth: '3px', borderColor: 'var(--color1)'}}>
+          <Link onClick={(e)=>onClickNoticePost(e, post)} component='button'>
+            <PostListTypographyTitle>{post.name}</PostListTypographyTitle>
+          </Link>
+
+          <Link>
+            <PostListTypographyWriter>{post.writer}</PostListTypographyWriter>
+          </Link>
+
+          <PostListTypographyThumbs>{post.thumbsUp}</PostListTypographyThumbs>
+        </Box>
     ));
   }
 
-  console.log(postList);
+  const onClickNoticePost = (e, post) => {
+    e.preventDefault();
+
+    navigate('/post', {state: {postDetail: post}});
+  }
 
   return(
     <Contants>
@@ -81,15 +93,16 @@ const Notice = () => {
           </CustomTypography>
         </Box>
       </CustomBox>
-      <CustomBox>
-        <Box sx={{margin: '0px 0px 5px 0px', borderBottomStyle: 'solid', borderTopStyle: 'solid', borderWidth: '1px'}}>
-          <PostListTypographyTitle>제목</PostListTypographyTitle>
-          <PostListTypographyWriter>작성자</PostListTypographyWriter>
-          <PostListTypographyThumbs>추천수</PostListTypographyThumbs>
-        </Box>
+      <CustomBox>        
+        <PostListTypographyTitle>제목</PostListTypographyTitle>
+        <PostListTypographyWriter>작성자</PostListTypographyWriter>
+        <PostListTypographyThumbs>추천수</PostListTypographyThumbs>
+      </CustomBox>
         
+      <CustomBox>
         {postList ? <PostListComponent/> : <></>}
       </CustomBox>
+      <Link>aa</Link>
     </Contants>
   )
 }
