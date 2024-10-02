@@ -11,8 +11,9 @@ import { createTheme, ThemeProvider } from '@mui/material';
 import UserRegister from './pages/user/UserRegister';
 import EmailValidation from './pages/user/EmailValidation';
 import { RecoilRoot } from 'recoil';
-import Main from './pages/main/main';
+import Main from './pages/main/Main';
 import Notice from './pages/notice/Notice';
+import Post from './pages/post/Post';
 
 const theme = createTheme({
   typography: {
@@ -44,6 +45,10 @@ const bodyRouter = createBrowserRouter([
   {
     path: '/notice',
     element: <Notice/>
+  },
+  {
+    path: '/post',
+    element: <Post/>
   },
 ]);
 
