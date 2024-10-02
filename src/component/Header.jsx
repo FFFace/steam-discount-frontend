@@ -64,6 +64,10 @@ const Header = () =>{
     navigate('/');
   }
 
+  const onClickNoticeButton = () => {
+    navigate('/notice');
+  }
+
   return(
     <Box sx={{display: 'block', margin: '30px 0px 30px 0px'}}>
       <Box sx={{backgroundColor: 'var(--color2)',}}>
@@ -73,7 +77,7 @@ const Header = () =>{
         <CustomButton onClick={onClickDiscountList}>
           할인 목록
         </CustomButton>
-        <CustomButton>
+        <CustomButton onClick={onClickNoticeButton}>
           공지사항
         </CustomButton>
         <CustomButton>

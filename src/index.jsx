@@ -12,6 +12,7 @@ import UserRegister from './pages/user/UserRegister';
 import EmailValidation from './pages/user/EmailValidation';
 import { RecoilRoot } from 'recoil';
 import Main from './pages/main/main';
+import Notice from './pages/notice/Notice';
 
 const theme = createTheme({
   typography: {
@@ -39,6 +40,10 @@ const bodyRouter = createBrowserRouter([
   {
     path: '/email-validation',
     element: <EmailValidation/>
+  },
+  {
+    path: '/notice',
+    element: <Notice/>
   },
 ]);
 
