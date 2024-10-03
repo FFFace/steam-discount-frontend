@@ -5,7 +5,6 @@ import CustomTypography from "../../component/ui/typography/CustomTypography";
 import { useEffect, useState } from "react";
 import { axiosInstance } from "../../utils/axios";
 import { Link, useNavigate } from "react-router-dom";
-import { CustomButton } from "../../component/ui/button/CustomButton";
 import Loading from "../../component/ui/loading/Loading";
 
 
@@ -85,7 +84,7 @@ const Notice = () => {
   const onClickNoticePost = (e, post) => {
     e.preventDefault();
 
-    navigate('/post', {state: {postDetail: post}});
+    navigate('/post', {state: {post: post}});
   }
 
   return(
@@ -104,7 +103,7 @@ const Notice = () => {
       </CustomBox>
         
       <CustomBox>
-        {postList ? <PostListComponent/> : <></>}
+        {postList ? <PostListComponent/> : null}
       </CustomBox>
 
       <Loading open={loading}/>
