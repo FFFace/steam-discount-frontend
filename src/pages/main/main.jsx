@@ -22,6 +22,7 @@ const Main = () => {
   const [discountList, setDiscountList] = useState();
   const [loading, setLoading] = useState(false);
   const [itemNum, setItemNum] = useState(0);
+  const [notice, setNotice] = useState(null);
 
   const [state, setState] = useRecoilState(userState);
 
@@ -37,7 +38,6 @@ const Main = () => {
       } catch(exception){
         console.log(exception);
       }
-      setLoading(false);
     }
 
     const pageOpen = async () => {
@@ -59,8 +59,22 @@ const Main = () => {
       }
     }
 
+    const mainNotice = async () => {
+      try{
+        const response = await axiosInstance.get('/posts/main-notice');
+
+        setNotice(response.data);
+        console.log(response.data);
+      } catch(exception){
+        console.log(exception);
+      }
+
+      setLoading(false);
+    }
+
     pageOpen();
     getRandomDiscountFive();
+    mainNotice();
   }, [])
 
   const onClickDiscountRightButton = () => {
@@ -79,12 +93,22 @@ const Main = () => {
     }
   }
 
+  const NoticeComponent = () => {
+    return(
+      <Box>
+        <CustomTypography>
+          {notice.name}
+        </CustomTypography>
+      </Box>
+    )
+  }
+
   const DiscountTitle = () => {
     return (
       <Box sx={{display: 'flex'}}>
         <Box sx={{display: 'flex', margin: 'auto'}}>
           <img src={discountList[itemNum].image}/>   
-          <CustomTypography sx={{margin: '10px 0px 5px 10px', display: 'inline-block'}}>
+          <CustomTypography sx={{margin: '10px 0px 5px 10px', display: 'inline-block', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap'}}>
             {discountList[itemNum].name}
           </CustomTypography>          
         </Box>
@@ -116,35 +140,44 @@ const Main = () => {
     <Contants>
       <CustomBox>
         <CustomTypography variant='h5' sx={{padding: '10px'}}>
-          공지사항
+          최신 공지
         </CustomTypography>
+        <Box sx={{borderTopStyle: 'solid', borderBottomStyle: 'solid', borderWidth: '3px', borderColor: 'var(--color1)'}}>
+          <Box sx={{padding: '10px'}}>
+            {notice ? <NoticeComponent/> : null}
+          </Box>
+        </Box>
+
       </CustomBox>
+
       <CustomBox>
         <CustomTypography variant='h5' sx={{padding: '10px'}}>
           지금 할인 중!
         </CustomTypography>
-      </CustomBox>      
-      <CustomBox sx={{margin: '15px', padding: '5px', backgroundColor: 'var(--color2)'}}>
-        <CustomButton onClick={onClickDiscountLeftButton} sx={{ color: 'var(--color4)',":hover": {
-          background: 'var(--color2)'
-          }, margin: '40px 0px', float: 'left'}}>
-          <ArrowLeft fontSize='large' sx={{color: 'var(--color4)'}}/>
-        </CustomButton>
-        <CustomButton onClick={onClickDiscountRightButton} sx={{ color: 'var(--color4)',":hover": {
-          background: 'var(--color2)'
-          }, margin: '40px 0px', float: 'right'}}>
-          <ArrowRight fontSize='large' sx={{color: 'var(--color4)'}}/>
-        </CustomButton>
-        <Box sx={{margin: '10px 0px'}}>
-          {discountList ? <DiscountTitle/> : <></>}
-          {discountList ? <DiscountPayload/> : <></>}
+
+        <Box sx={{borderTopStyle: 'solid', borderBottomStyle: 'solid', borderWidth: '3px', borderColor: 'var(--color1)'}}>
+
+          <CustomButton onClick={onClickDiscountLeftButton} sx={{ color: 'var(--color4)',":hover": {
+            background: 'var(--color2)'
+            }, margin: '40px 0px', float: 'left'}}>
+            <ArrowLeft fontSize='large' sx={{color: 'var(--color4)'}}/>
+          </CustomButton>
+          <CustomButton onClick={onClickDiscountRightButton} sx={{ color: 'var(--color4)',":hover": {
+            background: 'var(--color2)'
+            }, margin: '40px 0px', float: 'right'}}>
+            <ArrowRight fontSize='large' sx={{color: 'var(--color4)'}}/>
+          </CustomButton>
+          <Box sx={{margin: '10px 0px'}}>
+            {discountList ? <DiscountTitle/> : null}
+            {discountList ? <DiscountPayload/> : null}
+          </Box>
+          <CustomButton sx={{ color: 'var(--color4)',":hover": {
+            background: 'var(--color2)'
+            }, 
+            margin: '-40px 0px',float: 'right'}} onClick={onClickMoreDiscoutList}>
+            할인 더 보기
+          </CustomButton>
         </Box>
-        <CustomButton sx={{ color: 'var(--color4)',":hover": {
-          background: 'var(--color2)'
-          }, 
-          margin: '-40px 0px',float: 'right'}} onClick={onClickMoreDiscoutList}>
-          할인 더 보기
-        </CustomButton>
       </CustomBox>      
       <Loading open={loading}/>
     </Contants> 
