@@ -7,6 +7,7 @@ import { Box, IconButton } from "@mui/material"
 import { axiosInstance } from "../../utils/axios"
 import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
 import ThumbDownAlt from "@mui/icons-material/ThumbDownAlt"
+import Loading from "../../component/ui/loading/Loading"
 
 
 
@@ -15,12 +16,14 @@ const Post = () => {
   const location = useLocation();
   const postInfo = location.state?.post;
   const [postDetailInfo, setPostDetailInfo] = useState(null);
-  
+  const [loading, setLoading] = useState(false);
 
   console.log(postInfo);
 
   useEffect(()=>{
+    setLoading(true);
     const getContent = async () => {
+      
       try{
         const response = (await axiosInstance.get(`/posts/${postInfo.id}`)).data;
         setPostDetailInfo(response);
@@ -28,6 +31,8 @@ const Post = () => {
       } catch(exception){
         console.log(exception);
       }
+
+      setLoading(false);
     }
     getContent();
   }, [])
@@ -82,6 +87,7 @@ const Post = () => {
         {postDetailInfo ? <PostContentComponent/> : null}
         {postDetailInfo ? <PostThumbsComponent/> : null}
       </CustomBox>
+      <Loading open={loading}/>
     </Contants>
   )
 }

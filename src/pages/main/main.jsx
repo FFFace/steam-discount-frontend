@@ -38,7 +38,6 @@ const Main = () => {
       } catch(exception){
         console.log(exception);
       }
-      setLoading(false);
     }
 
     const pageOpen = async () => {
@@ -69,6 +68,8 @@ const Main = () => {
       } catch(exception){
         console.log(exception);
       }
+
+      setLoading(false);
     }
 
     pageOpen();

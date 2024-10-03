@@ -35,6 +35,7 @@ const Notice = () => {
       } catch(exception){
         console.log(exception);
       }
+
       setLoading(false);
     }
 
