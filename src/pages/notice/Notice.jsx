@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { axiosInstance } from "../../utils/axios";
 import { Link, useNavigate } from "react-router-dom";
 import { CustomButton } from "../../component/ui/button/CustomButton";
+import Loading from "../../component/ui/loading/Loading";
 
 
 const NOTICE_BOARD_NUMBER = 1;
@@ -15,10 +16,12 @@ const Notice = () => {
   const [page, setPage] = useState(0);
   const [totalPage, setTotalPage] = useState(0);
   const [postList, setPostList] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
   useEffect(() => {
+    setLoading(true);
     const getNoticeList = async () => {
       try{
         const response = await axiosInstance.get(`/posts`, {
@@ -33,6 +36,7 @@ const Notice = () => {
       } catch(exception){
         console.log(exception);
       }
+      setLoading(false);
     }
 
     getNoticeList();
@@ -102,7 +106,8 @@ const Notice = () => {
       <CustomBox>
         {postList ? <PostListComponent/> : <></>}
       </CustomBox>
-      <Link>aa</Link>
+
+      <Loading open={loading}/>
     </Contants>
   )
 }
