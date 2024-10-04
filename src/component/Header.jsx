@@ -12,7 +12,7 @@ import Loading from './ui/loading/Loading';
 const Header = () =>{
 
   const navigate = useNavigate();
-  const [state, setState] = useRecoilState(userState);
+  const [recoilState, setRecoilState] = useRecoilState(userState);
   const [loading, setLoading] = useState(false);
 
   const onClickDiscountList = () =>{
@@ -32,8 +32,8 @@ const Header = () =>{
       console.log(exception);
     }
 
-    setState({
-      ...state,
+    setRecoilState({
+      ...recoilState,
       isLoggedIn: false
     })
 
@@ -83,7 +83,7 @@ const Header = () =>{
         <CustomButton>
           커뮤니티
         </CustomButton>
-        {state.isLoggedIn ? <LogoutButton/> : <LoginButton/>}
+        {recoilState.isLoggedIn ? <LogoutButton/> : <LoginButton/>}
       </Box>  
       <Loading open={loading}/>
     </Box>
