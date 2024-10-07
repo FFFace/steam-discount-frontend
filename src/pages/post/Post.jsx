@@ -76,18 +76,39 @@ const Post = () => {
   const onClickThumbsUpButton = () => {
     if(isLoggedInForThumbsButton())
       return;
+
+    reqeustThumbs('thumbs-up')
   }
 
   const OnClickThumbsDownButton = () => {
     if(isLoggedInForThumbsButton())
       return;
 
-
+    reqeustThumbs('thumbs-down ');
   }
 
   const isLoggedInForThumbsButton = () => {
     setDialog(!recoilState.isLoggedIn);
-    return dialog;
+      return !dialog;
+  }
+
+  /** 
+   * 게시글 추천 또는 비추천 요청 함수 입니다.
+   * @param {string} thumbs thumbs-up 또는 thumbs-down 
+   */
+  const reqeustThumbs = async (thumbs) => {
+    try{
+      const response = axiosInstance.post(`/${postInfo.id}/${thumbs}`).data;
+
+      setPostDetailInfo({
+        ...postDetailInfo,
+        thumbsUp: response.thumbsUp
+      });
+
+
+    } catch(exception){
+      console.log(exception);
+    }
   }
 
   const DialogError = () => {

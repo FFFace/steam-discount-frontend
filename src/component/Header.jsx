@@ -1,19 +1,47 @@
 import { Typography, Box, Container, Button } from '@mui/material';
 import {CustomButton} from './ui/button/CustomButton';
 import { useNavigate } from 'react-router-dom';
-import { setLoginState, loginState } from '../utils/storage';
+import { setLoginState, loginState, saveAccessToken, saveLogged, removeAccessToken, removeRefreshToken } from '../utils/storage';
 import { useEffect, useState } from 'react';
 import CustomTypography from './ui/typography/CustomTypography';
 import { useRecoilState } from 'recoil';
 import { userState } from '../utils/atom';
 import { axiosInstance } from '../utils/axios';
 import Loading from './ui/loading/Loading';
+import { CustomDialog } from './ui/dialog/CustomDialog';
 
 const Header = () =>{
 
   const navigate = useNavigate();
   const [recoilState, setRecoilState] = useRecoilState(userState);
   const [loading, setLoading] = useState(false);
+
+
+  useEffect(() =>{
+    const pageOpen = async () => {
+      try{
+        await axiosInstance.get(`/token-check`);
+
+        setRecoilState({
+          ...recoilState,
+          isLoggedIn: true
+        })
+
+      } catch(exception){
+
+        setRecoilState({
+          ...recoilState,
+          isLoggedIn: false
+        })
+
+        removeAccessToken();
+        removeRefreshToken();
+      }
+    }
+
+    if(recoilState.isLoggedIn)
+      pageOpen();
+  }, []);
 
   const onClickDiscountList = () =>{
     navigate('/discount-list');

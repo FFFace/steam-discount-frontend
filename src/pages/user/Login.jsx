@@ -58,7 +58,6 @@ const Login = () => {
         password: info.password
       });
 
-      saveAccessToken(response.headers['authorization']);
       setState({
         ...state,
         isLoggedIn: true
@@ -89,7 +88,7 @@ const Login = () => {
         <CustomDialogTitle>로그인 성공</CustomDialogTitle>
         <CustomDialogContent>
           로그인되었습니다.<br/>
-          타이틀로 돌아갑니다.<br/>
+          이전 페이지로 돌아갑니다.<br/>
         </CustomDialogContent>
         <DialogActions>
           <CustomButton onClick={onClickLoginSuccess}>확인</CustomButton>
@@ -119,7 +118,7 @@ const Login = () => {
   }
 
   const onClickLoginSuccess = () => {
-    navigate('/');
+    navigate(-1);
   }
 
   return (

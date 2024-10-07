@@ -31,31 +31,11 @@ const Main = () => {
       setLoading(true);
       try{
         const response = await axiosInstance.get(`/discount-five`);
-        console.log(response.data);
 
         setDiscountList(response.data);         
 
       } catch(exception){
-        console.log(exception);
-      }
-    }
 
-    const pageOpen = async () => {
-      try{
-        const response = await axiosInstance.get(`/token-check`)
-  
-        saveAccessToken(response.headers['authorization']);
-        setState({
-          ...state,
-          isLoggedIn: true
-        });
-      } catch(exception){
-        console.log(exception);
-
-        setState({
-          ...state,
-          isLoggedIn: false
-        });
       }
     }
 
@@ -64,15 +44,13 @@ const Main = () => {
         const response = await axiosInstance.get('/posts/main-notice');
 
         setNotice(response.data);
-        console.log(response.data);
       } catch(exception){
-        console.log(exception);
+
       }
 
       setLoading(false);
     }
 
-    pageOpen();
     getRandomDiscountFive();
     mainNotice();
   }, [])
