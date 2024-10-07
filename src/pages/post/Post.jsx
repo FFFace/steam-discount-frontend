@@ -33,9 +33,9 @@ const Post = () => {
       try{
         const response = (await axiosInstance.get(`/posts/${postInfo.id}`)).data;
         setPostDetailInfo(response);
-        console.log(response);
+
       } catch(exception){
-        console.log(exception);
+
       }
 
       setLoading(false);
@@ -74,9 +74,11 @@ const Post = () => {
   }
 
   const onClickThumbsUpButton = () => {
-    if(isLoggedInForThumbsButton())
+    if(isLoggedInForThumbsButton()){
       return;
-
+    }
+      
+  
     reqeustThumbs('thumbs-up')
   }
 
@@ -89,7 +91,7 @@ const Post = () => {
 
   const isLoggedInForThumbsButton = () => {
     setDialog(!recoilState.isLoggedIn);
-      return !dialog;
+    return !recoilState.isLoggedIn;
   }
 
   /** 
@@ -97,18 +99,23 @@ const Post = () => {
    * @param {string} thumbs thumbs-up 또는 thumbs-down 
    */
   const reqeustThumbs = async (thumbs) => {
+    setLoading(true);
     try{
-      const response = axiosInstance.post(`/${postInfo.id}/${thumbs}`).data;
+      const response = await axiosInstance.post(`posts/${postInfo.id}/${thumbs}`);
 
       setPostDetailInfo({
         ...postDetailInfo,
-        thumbsUp: response.thumbsUp
+        thumbsUp: response.data.thumbsUp,
+        thumbsDown: response.data.thumbsDown
       });
 
+      console.log(response.data);
 
     } catch(exception){
       console.log(exception);
     }
+
+    setLoading(false);
   }
 
   const DialogError = () => {
