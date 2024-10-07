@@ -3,11 +3,15 @@ import Contants from "../../component/Contants"
 import { CustomBox } from "../../component/ui/box/CustomBox"
 import CustomTypography from "../../component/ui/typography/CustomTypography"
 import { useLocation } from "react-router-dom"
-import { Box, IconButton } from "@mui/material"
+import { Box, Button, DialogActions, IconButton } from "@mui/material"
 import { axiosInstance } from "../../utils/axios"
 import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
 import ThumbDownAlt from "@mui/icons-material/ThumbDownAlt"
 import Loading from "../../component/ui/loading/Loading"
+import { useRecoilState } from "recoil"
+import { userState } from "../../utils/atom"
+import { CustomDialog, CustomDialogContent, CustomDialogErrorTitle, CustomDialogTitle } from "../../component/ui/dialog/CustomDialog"
+import { CustomButton } from "../../component/ui/button/CustomButton"
 
 
 
@@ -15,10 +19,12 @@ const Post = () => {
 
   const location = useLocation();
   const postInfo = location.state?.post;
+
   const [postDetailInfo, setPostDetailInfo] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [dialog, setDialog] = useState(false);
 
-  console.log(postInfo);
+  const [recoilState, setRecoilState] = useRecoilState(userState);
 
   useEffect(()=>{
     setLoading(true);
@@ -50,14 +56,14 @@ const Post = () => {
   const PostThumbsComponent = () => {
     return(
       <Box sx={{margin: '50px 0px 0px 0px',padding: '10px', textAlign: 'center'}}>
-        <IconButton sx={{margin: '0px 5px 0px 0px'}}>
+        <IconButton sx={{margin: '0px 5px 0px 0px'}} onClick={onClickThumbsUpButton}>
           <ThumbUpAltIcon fontSize='large' sx={{color: 'white'}}/>
         </IconButton>
         <CustomTypography sx={{display: 'inline-block'}}>
           {postDetailInfo.thumbsUp}
         </CustomTypography>
 
-        <IconButton sx={{margin: '0px 5px 0px 40px'}}>
+        <IconButton sx={{margin: '0px 5px 0px 40px'}} onClick={OnClickThumbsDownButton}>
           <ThumbDownAlt fontSize='large' sx={{color: 'white'}}/>
         </IconButton>
         <CustomTypography sx={{display: 'inline-block'}}>
@@ -65,6 +71,46 @@ const Post = () => {
         </CustomTypography>
       </Box>
     )
+  }
+
+  const onClickThumbsUpButton = () => {
+    if(isLoggedInForThumbsButton())
+      return;
+  }
+
+  const OnClickThumbsDownButton = () => {
+    if(isLoggedInForThumbsButton())
+      return;
+
+
+  }
+
+  const isLoggedInForThumbsButton = () => {
+    setDialog(!recoilState.isLoggedIn);
+    return dialog;
+  }
+
+  const DialogError = () => {
+    return(
+      <CustomDialog open={dialog}>
+        <CustomDialogErrorTitle>
+          사용할 수 없습니다.
+        </CustomDialogErrorTitle>
+        <CustomDialogContent>
+          로그인 한 사용자만 이용할 수 있습니다.<br/>
+          로그인 후 다시 이용해 주세요.
+        </CustomDialogContent>
+        <DialogActions>
+          <CustomButton onClick={onClickDialogErrorAccept}>
+            확인
+          </CustomButton>
+        </DialogActions>
+      </CustomDialog>
+    )
+  }
+
+  const onClickDialogErrorAccept = () => {
+    setDialog(false);
   }
 
   return(
@@ -87,6 +133,7 @@ const Post = () => {
         {postDetailInfo ? <PostContentComponent/> : null}
         {postDetailInfo ? <PostThumbsComponent/> : null}
       </CustomBox>
+      <DialogError/>
       <Loading open={loading}/>
     </Contants>
   )
