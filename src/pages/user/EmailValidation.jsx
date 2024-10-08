@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import Contants from "../../component/Contants";
+import Contents from "../../component/Contents";
 import { CustomBox } from "../../component/ui/box/CustomBox";
 import { CustomButton, CustomButtonWhite } from "../../component/ui/button/CustomButton";
 import { CustomTextField } from "../../component/ui/textField/CustomTextField";
@@ -106,7 +106,7 @@ const EmailValidation = () => {
   }
 
   return (
-    <Contants>
+    <Contents>
       <Loading open={loading} />
       <CustomBox>
         <CustomTypography variant='h5'>
@@ -126,7 +126,7 @@ const EmailValidation = () => {
       </CustomBox>
       <VerifyFailDialog/>
       <VerifySuccessDialog/>
-    </Contants>
+    </Contents>
   )
 }
 

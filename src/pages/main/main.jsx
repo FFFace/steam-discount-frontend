@@ -1,5 +1,5 @@
 import { Box, Button, IconButton } from "@mui/material";
-import Contants from "../../component/Contants"
+import Contents from "../../component/Contents"
 import { CustomBox } from "../../component/ui/box/CustomBox";
 import CustomTypography from "../../component/ui/typography/CustomTypography";
 import { useEffect, useState } from "react";
@@ -11,7 +11,7 @@ import { ArrowRight } from "@mui/icons-material";
 import { userState } from "../../utils/atom";
 import { useRecoilState } from "recoil";
 import { saveAccessToken } from "../../utils/storage";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const DISCOUNT_SAMPLE_MAX_COUNT = 4;
 
@@ -31,31 +31,11 @@ const Main = () => {
       setLoading(true);
       try{
         const response = await axiosInstance.get(`/discount-five`);
-        console.log(response.data);
 
         setDiscountList(response.data);         
 
       } catch(exception){
-        console.log(exception);
-      }
-    }
 
-    const pageOpen = async () => {
-      try{
-        const response = await axiosInstance.get(`/token-check`)
-  
-        saveAccessToken(response.headers['authorization']);
-        setState({
-          ...state,
-          isLoggedIn: true
-        });
-      } catch(exception){
-        console.log(exception);
-
-        setState({
-          ...state,
-          isLoggedIn: false
-        });
       }
     }
 
@@ -64,15 +44,13 @@ const Main = () => {
         const response = await axiosInstance.get('/posts/main-notice');
 
         setNotice(response.data);
-        console.log(response.data);
       } catch(exception){
-        console.log(exception);
+
       }
 
       setLoading(false);
     }
 
-    pageOpen();
     getRandomDiscountFive();
     mainNotice();
   }, [])
@@ -93,13 +71,24 @@ const Main = () => {
     }
   }
 
+  const onClickMainNoticeButton = (e) => {
+    e.preventDefault();
+    navigate('/post', {
+      state: {
+        post: notice
+      }
+    })
+  }
+
   const NoticeComponent = () => {
     return(
-      <Box>
-        <CustomTypography>
-          {notice.name}
-        </CustomTypography>
-      </Box>
+      <Link component='button' onClick={onClickMainNoticeButton}>
+        <Box>
+          <CustomTypography sx={{display: 'inline-block'}}>
+            {notice.name}
+          </CustomTypography>
+        </Box>
+      </Link>
     )
   }
 
@@ -108,7 +97,7 @@ const Main = () => {
       <Box sx={{display: 'flex'}}>
         <Box sx={{display: 'flex', margin: 'auto'}}>
           <img src={discountList[itemNum].image}/>   
-          <CustomTypography sx={{margin: '10px 0px 5px 10px', display: 'inline-block', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap'}}>
+          <CustomTypography sx={{margin: '10px 0px 5px 10px', width: '45%', display: 'inline-block', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap'}}>
             {discountList[itemNum].name}
           </CustomTypography>          
         </Box>
@@ -137,7 +126,7 @@ const Main = () => {
   }
 
   return(
-    <Contants>
+    <Contents>
       <CustomBox>
         <CustomTypography variant='h5' sx={{padding: '10px'}}>
           최신 공지
@@ -180,7 +169,7 @@ const Main = () => {
         </Box>
       </CustomBox>      
       <Loading open={loading}/>
-    </Contants> 
+    </Contents> 
   )
 }
 

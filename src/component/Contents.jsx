@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Header from "./Header";
 import Footer from "./Footer";
 
-const Contants = ({children}) =>{
+const Contents = ({children}) =>{
 
   return(
     <Container>
@@ -22,4 +22,4 @@ const Container = styled.div`
   border: solid 1px var(--color2)
 `
 
-export default Contants;
+export default Contents;

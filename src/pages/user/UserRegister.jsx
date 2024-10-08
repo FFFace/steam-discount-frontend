@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import Contants from "../../component/Contants";
+import Contents from "../../component/Contents";
 import { CustomBox } from "../../component/ui/box/CustomBox";
 import { CustomButton, CustomButtonWhite } from "../../component/ui/button/CustomButton";
 import { CustomTextField } from "../../component/ui/textField/CustomTextField";
@@ -215,7 +215,7 @@ const UserRegister = () => {
   }
 
   return (
-    <Contants>
+    <Contents>
       <Loading open={loading} />
       <CustomBox>
         <CustomTypography variant='h5'>
@@ -246,7 +246,7 @@ const UserRegister = () => {
 
         {resistable ? (<CustomButtonWhite onClick={onClickRegister}>회원가입</CustomButtonWhite>) : <CustomButtonWhite disabled>회원가입</CustomButtonWhite>}
       </CustomBox>
-    </Contants>
+    </Contents>
   );
 };
 

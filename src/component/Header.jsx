@@ -1,19 +1,65 @@
 import { Typography, Box, Container, Button } from '@mui/material';
 import {CustomButton} from './ui/button/CustomButton';
 import { useNavigate } from 'react-router-dom';
-import { setLoginState, loginState } from '../utils/storage';
+import { setLoginState, loginState, saveAccessToken, saveLogged, removeAccessToken, removeRefreshToken } from '../utils/storage';
 import { useEffect, useState } from 'react';
 import CustomTypography from './ui/typography/CustomTypography';
 import { useRecoilState } from 'recoil';
-import { userState } from '../utils/atom';
+import { boardState, userState } from '../utils/atom';
 import { axiosInstance } from '../utils/axios';
 import Loading from './ui/loading/Loading';
+import { CustomDialog } from './ui/dialog/CustomDialog';
 
 const Header = () =>{
 
   const navigate = useNavigate();
-  const [state, setState] = useRecoilState(userState);
+  
+  const [recoilState, setRecoilState] = useRecoilState(userState);
+  const [boardList, setBoardList] = useRecoilState(boardState);
+
   const [loading, setLoading] = useState(false);
+
+  useEffect(() =>{
+    const pageOpen = async () => {
+      try{
+        await axiosInstance.get(`/token-check`);
+
+        setRecoilState({
+          ...recoilState,
+          isLoggedIn: true
+        })
+
+      } catch(exception){
+
+        setRecoilState({
+          ...recoilState,
+          isLoggedIn: false
+        })
+
+        removeAccessToken();
+        removeRefreshToken();
+      }
+    }
+
+    const getBoardList = async () => {
+      try{
+        const response = await axiosInstance.get(`/boards`);
+
+        setBoardList({
+          boardList: response.data
+        });
+
+      } catch(exception){
+        console.log(exception);
+      }
+    }
+
+    if(recoilState.isLoggedIn)
+      pageOpen();
+
+    if(!boardList.boardList)
+      getBoardList();      
+  }, []);
 
   const onClickDiscountList = () =>{
     navigate('/discount-list');
@@ -32,8 +78,8 @@ const Header = () =>{
       console.log(exception);
     }
 
-    setState({
-      ...state,
+    setRecoilState({
+      ...recoilState,
       isLoggedIn: false
     })
 
@@ -68,6 +114,10 @@ const Header = () =>{
     navigate('/notice');
   }
 
+  const onClickPostButton = () => {
+
+  }
+
   return(
     <Box sx={{display: 'block', margin: '30px 0px 30px 0px'}}>
       <Box sx={{backgroundColor: 'var(--color2)',}}>
@@ -80,10 +130,10 @@ const Header = () =>{
         <CustomButton onClick={onClickNoticeButton}>
           공지사항
         </CustomButton>
-        <CustomButton>
-          커뮤니티
+        <CustomButton onClick={onClickPostButton}>
+          게시판
         </CustomButton>
-        {state.isLoggedIn ? <LogoutButton/> : <LoginButton/>}
+        {recoilState.isLoggedIn ? <LogoutButton/> : <LoginButton/>}
       </Box>  
       <Loading open={loading}/>
     </Box>

@@ -1,11 +1,12 @@
 import { Box, Button } from "@mui/material";
-import Contants from "../../component/Contants";
+import Contents from "../../component/Contents";
 import { CustomBox } from "../../component/ui/box/CustomBox";
 import CustomTypography from "../../component/ui/typography/CustomTypography";
 import { useEffect, useState } from "react";
 import { axiosInstance } from "../../utils/axios";
 import { Link, useNavigate } from "react-router-dom";
 import Loading from "../../component/ui/loading/Loading";
+import { CustomButton } from "../../component/ui/button/CustomButton";
 
 
 const NOTICE_BOARD_NUMBER = 1;
@@ -82,6 +83,17 @@ const Notice = () => {
     ));
   }
 
+  const onClickWritePostButton = () => {
+    navigate('/write-post', {
+      state: {
+        board: {
+         id: NOTICE_BOARD_NUMBER,
+         name: '공지사항' 
+        }
+      }
+    })
+  }
+
   const onClickNoticePost = (e, post) => {
     e.preventDefault();
 
@@ -89,9 +101,12 @@ const Notice = () => {
   }
 
   return(
-    <Contants>
+    <Contents>
       <CustomBox>
         <Box sx={{padding: '10px'}}>
+          <Button size='large' onClick={onClickWritePostButton} sx={{color: 'var(--color4)', float: 'right', ":hover": {background: 'var(--color2)'}}}>
+            글쓰기
+          </Button>
           <CustomTypography variant='h5'>
             공지사항
           </CustomTypography>
@@ -108,7 +123,7 @@ const Notice = () => {
       </CustomBox>
 
       <Loading open={loading}/>
-    </Contants>
+    </Contents>
   )
 }
 

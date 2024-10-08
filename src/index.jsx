@@ -14,6 +14,8 @@ import { RecoilRoot } from 'recoil';
 import Main from './pages/main/Main';
 import Notice from './pages/notice/Notice';
 import Post from './pages/post/Post';
+import WritePost from './pages/post/WritePost';
+import PostList from './pages/post/PostList';
 
 const theme = createTheme({
   typography: {
@@ -47,8 +49,16 @@ const bodyRouter = createBrowserRouter([
     element: <Notice/>
   },
   {
+    path: '/post-list',
+    element: <PostList/>
+  },
+  {
     path: '/post',
     element: <Post/>
+  },
+  {
+    path: '/write-post',
+    element: <WritePost/>
   },
 ]);
 
@@ -56,7 +66,8 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <ThemeProvider theme={theme}>
     <RecoilRoot>
-      <RouterProvider router={bodyRouter}/>
+      <RouterProvider router={bodyRouter}>
+      </RouterProvider>
     </RecoilRoot>    
   </ThemeProvider>  
 );

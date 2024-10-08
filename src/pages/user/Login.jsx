@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Contants from "../../component/Contants"
+import Contents from "../../component/Contents";
 import { Box, DialogActions, DialogTitle} from "@mui/material";
 import { CustomBox } from "../../component/ui/box/CustomBox";
 import CustomTypography from "../../component/ui/typography/CustomTypography";
@@ -58,7 +58,6 @@ const Login = () => {
         password: info.password
       });
 
-      saveAccessToken(response.headers['authorization']);
       setState({
         ...state,
         isLoggedIn: true
@@ -89,7 +88,7 @@ const Login = () => {
         <CustomDialogTitle>로그인 성공</CustomDialogTitle>
         <CustomDialogContent>
           로그인되었습니다.<br/>
-          타이틀로 돌아갑니다.<br/>
+          이전 페이지로 돌아갑니다.<br/>
         </CustomDialogContent>
         <DialogActions>
           <CustomButton onClick={onClickLoginSuccess}>확인</CustomButton>
@@ -119,11 +118,11 @@ const Login = () => {
   }
 
   const onClickLoginSuccess = () => {
-    navigate('/');
+    navigate(-1);
   }
 
   return (
-    <Contants>
+    <Contents>
       <CustomBox>
         <Box sx={{padding: '10px'}}>
           <CustomTypography variant='h5'>
@@ -155,7 +154,7 @@ const Login = () => {
       <LoginFailed loginFailedOpen={errorState.loginFailed} loginFailedDialogAccept={loginFailedDialogAccept}/>
       <NeedDuplicateEmail needDuplicateOpen={errorState.needDuplicateEmail} needDuplicateDialogAccept={needDuplicateDialogAccept}/>
       <Loading open={loading} />
-    </Contants>
+    </Contents>
   );
 };
 
