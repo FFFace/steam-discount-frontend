@@ -158,12 +158,12 @@ const Post = () => {
         </Box>
       </CustomBox>
       <CustomBox>
-        <CustomTypography sx={{padding: '10px'}}>
-          {postInfo.name}
+        <CustomTypography sx={{padding: '10px', fontSize: 'larger', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap'}}>
+          {postInfo ? postInfo.name : null}
         </CustomTypography>
         <Box>
           <CustomTypography sx={{display: 'inline-block', padding: '0px 0px 10px 10px'}}>
-            작성자: {postInfo.writer}
+            작성자: {postInfo ? postInfo.writer : null}
           </CustomTypography>
           <CustomTypography sx={{display: 'inline-block', padding: '0px 10px 10px 0px', float: 'right'}}>
             작성일: {postDetailInfo ? postDetailInfo.createdAt : null}

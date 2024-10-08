@@ -11,7 +11,7 @@ import { ArrowRight } from "@mui/icons-material";
 import { userState } from "../../utils/atom";
 import { useRecoilState } from "recoil";
 import { saveAccessToken } from "../../utils/storage";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const DISCOUNT_SAMPLE_MAX_COUNT = 4;
 
@@ -71,13 +71,24 @@ const Main = () => {
     }
   }
 
+  const onClickMainNoticeButton = (e) => {
+    e.preventDefault();
+    navigate('/post', {
+      state: {
+        post: notice
+      }
+    })
+  }
+
   const NoticeComponent = () => {
     return(
-      <Box>
-        <CustomTypography>
-          {notice.name}
-        </CustomTypography>
-      </Box>
+      <Link component='button' onClick={onClickMainNoticeButton}>
+        <Box>
+          <CustomTypography sx={{display: 'inline-block'}}>
+            {notice.name}
+          </CustomTypography>
+        </Box>
+      </Link>
     )
   }
 
