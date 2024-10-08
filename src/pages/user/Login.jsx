@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Contants from "../../component/Contants"
+import Contents from "../../component/Contents";
 import { Box, DialogActions, DialogTitle} from "@mui/material";
 import { CustomBox } from "../../component/ui/box/CustomBox";
 import CustomTypography from "../../component/ui/typography/CustomTypography";
@@ -122,7 +122,7 @@ const Login = () => {
   }
 
   return (
-    <Contants>
+    <Contents>
       <CustomBox>
         <Box sx={{padding: '10px'}}>
           <CustomTypography variant='h5'>
@@ -154,7 +154,7 @@ const Login = () => {
       <LoginFailed loginFailedOpen={errorState.loginFailed} loginFailedDialogAccept={loginFailedDialogAccept}/>
       <NeedDuplicateEmail needDuplicateOpen={errorState.needDuplicateEmail} needDuplicateDialogAccept={needDuplicateDialogAccept}/>
       <Loading open={loading} />
-    </Contants>
+    </Contents>
   );
 };
 

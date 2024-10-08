@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Contants from "../../component/Contants";
+import Contents from "../../component/Contents";
 import { Box } from "@mui/material";
 import { axiosInstance } from '../../utils/axios';
 import CustomTypography from '../../component/ui/typography/CustomTypography'
@@ -52,7 +52,7 @@ const DiscountList = () => {
   }, []);
 
   return(
-    <Contants>
+    <Contents>
       <CustomBox>
         <Box sx={{padding: '10px'}}>
           <CustomTypography variant='h5'>
@@ -62,7 +62,7 @@ const DiscountList = () => {
       </CustomBox>
       {discountList ? <DiscountListComponent/> : <></>}
       <Loading open={loading} />
-    </Contants>
+    </Contents>
   );
 };
 

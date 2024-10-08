@@ -1,5 +1,5 @@
 import { Box, Button, IconButton } from "@mui/material";
-import Contants from "../../component/Contants"
+import Contents from "../../component/Contents"
 import { CustomBox } from "../../component/ui/box/CustomBox";
 import CustomTypography from "../../component/ui/typography/CustomTypography";
 import { useEffect, useState } from "react";
@@ -115,7 +115,7 @@ const Main = () => {
   }
 
   return(
-    <Contants>
+    <Contents>
       <CustomBox>
         <CustomTypography variant='h5' sx={{padding: '10px'}}>
           최신 공지
@@ -158,7 +158,7 @@ const Main = () => {
         </Box>
       </CustomBox>      
       <Loading open={loading}/>
-    </Contants> 
+    </Contents> 
   )
 }
 

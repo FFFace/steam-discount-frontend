@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import Contants from "../../component/Contants"
+import Contents from "../../component/Contents"
 import { CustomBox } from "../../component/ui/box/CustomBox"
 import CustomTypography from "../../component/ui/typography/CustomTypography"
 import { useLocation } from "react-router-dom"
@@ -142,7 +142,7 @@ const Post = () => {
   }
 
   return(
-    <Contants>
+    <Contents>
       <CustomBox>
         <CustomTypography variant='h5' sx={{padding: '10px'}}>
           {postInfo.name}
@@ -163,7 +163,7 @@ const Post = () => {
       </CustomBox>
       <DialogError/>
       <Loading open={loading}/>
-    </Contants>
+    </Contents>
   )
 }
 
