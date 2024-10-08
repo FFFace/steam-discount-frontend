@@ -109,7 +109,7 @@ const Header = () =>{
           공지사항
         </CustomButton>
         <CustomButton>
-          커뮤니티
+          게시판
         </CustomButton>
         {recoilState.isLoggedIn ? <LogoutButton/> : <LoginButton/>}
       </Box>  
