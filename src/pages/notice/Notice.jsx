@@ -84,7 +84,14 @@ const Notice = () => {
   }
 
   const onClickWritePostButton = () => {
-
+    navigate('/write-post', {
+      state: {
+        board: {
+         id: NOTICE_BOARD_NUMBER,
+         name: '공지사항' 
+        }
+      }
+    })
   }
 
   const onClickNoticePost = (e, post) => {
