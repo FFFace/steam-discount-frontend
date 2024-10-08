@@ -12,6 +12,8 @@ import { useRecoilState } from "recoil"
 import { userState } from "../../utils/atom"
 import { CustomDialog, CustomDialogContent, CustomDialogErrorTitle, CustomDialogTitle } from "../../component/ui/dialog/CustomDialog"
 import { CustomButton } from "../../component/ui/button/CustomButton"
+import { Viewer } from "@toast-ui/react-editor"
+import '@toast-ui/editor/dist/theme/toastui-editor-dark.css';
 
 
 
@@ -37,7 +39,6 @@ const Post = () => {
       } catch(exception){
 
       }
-
       setLoading(false);
     }
     getContent();
@@ -50,6 +51,14 @@ const Post = () => {
           {postDetailInfo.content}
         </CustomTypography>
       </Box>
+    )
+  }
+
+  const ToastPostContentComponent = () => {
+    return(
+      <Box sx={{padding: '10px'}}>
+        <Viewer initialValue={postDetailInfo.content} theme='dark'/>
+      </Box>      
     )
   }
 
@@ -109,8 +118,6 @@ const Post = () => {
         thumbsDown: response.data.thumbsDown
       });
 
-      console.log(response.data);
-
     } catch(exception){
       console.log(exception);
     }
@@ -144,7 +151,14 @@ const Post = () => {
   return(
     <Contents>
       <CustomBox>
-        <CustomTypography variant='h5' sx={{padding: '10px'}}>
+        <Box sx={{padding: '10px'}}>
+          <CustomTypography variant='h5'>
+            공지사항
+          </CustomTypography>
+        </Box>
+      </CustomBox>
+      <CustomBox>
+        <CustomTypography sx={{padding: '10px'}}>
           {postInfo.name}
         </CustomTypography>
         <Box>
@@ -152,13 +166,13 @@ const Post = () => {
             작성자: {postInfo.writer}
           </CustomTypography>
           <CustomTypography sx={{display: 'inline-block', padding: '0px 10px 10px 0px', float: 'right'}}>
-            작성일: 9999.99.99
+            작성일: {postDetailInfo ? postDetailInfo.createdAt : null}
           </CustomTypography>
         </Box>        
       </CustomBox>
 
       <CustomBox>
-        {postDetailInfo ? <PostContentComponent/> : null}
+        {postDetailInfo ? <ToastPostContentComponent/> : null}
         {postDetailInfo ? <PostThumbsComponent/> : null}
       </CustomBox>
       <DialogError/>
