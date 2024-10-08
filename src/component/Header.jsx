@@ -5,7 +5,7 @@ import { setLoginState, loginState, saveAccessToken, saveLogged, removeAccessTok
 import { useEffect, useState } from 'react';
 import CustomTypography from './ui/typography/CustomTypography';
 import { useRecoilState } from 'recoil';
-import { userState } from '../utils/atom';
+import { boardState, userState } from '../utils/atom';
 import { axiosInstance } from '../utils/axios';
 import Loading from './ui/loading/Loading';
 import { CustomDialog } from './ui/dialog/CustomDialog';
@@ -13,9 +13,11 @@ import { CustomDialog } from './ui/dialog/CustomDialog';
 const Header = () =>{
 
   const navigate = useNavigate();
+  
   const [recoilState, setRecoilState] = useRecoilState(userState);
-  const [loading, setLoading] = useState(false);
+  const [boardList, setBoardList] = useRecoilState(boardState);
 
+  const [loading, setLoading] = useState(false);
 
   useEffect(() =>{
     const pageOpen = async () => {
@@ -39,8 +41,24 @@ const Header = () =>{
       }
     }
 
+    const getBoardList = async () => {
+      try{
+        const response = await axiosInstance.get(`/boards`);
+
+        setBoardList({
+          boardList: response.data
+        });
+
+      } catch(exception){
+        console.log(exception);
+      }
+    }
+
     if(recoilState.isLoggedIn)
       pageOpen();
+
+    if(!boardList.boardList)
+      getBoardList();      
   }, []);
 
   const onClickDiscountList = () =>{
@@ -96,6 +114,10 @@ const Header = () =>{
     navigate('/notice');
   }
 
+  const onClickPostButton = () => {
+
+  }
+
   return(
     <Box sx={{display: 'block', margin: '30px 0px 30px 0px'}}>
       <Box sx={{backgroundColor: 'var(--color2)',}}>
@@ -108,7 +130,7 @@ const Header = () =>{
         <CustomButton onClick={onClickNoticeButton}>
           공지사항
         </CustomButton>
-        <CustomButton>
+        <CustomButton onClick={onClickPostButton}>
           게시판
         </CustomButton>
         {recoilState.isLoggedIn ? <LogoutButton/> : <LoginButton/>}
