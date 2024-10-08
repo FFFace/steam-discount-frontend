@@ -14,6 +14,7 @@ import { RecoilRoot } from 'recoil';
 import Main from './pages/main/Main';
 import Notice from './pages/notice/Notice';
 import Post from './pages/post/Post';
+import WritePost from './pages/post/WritePost';
 
 const theme = createTheme({
   typography: {
@@ -49,6 +50,10 @@ const bodyRouter = createBrowserRouter([
   {
     path: '/post',
     element: <Post/>
+  },
+  {
+    path: '/write-post',
+    element: <WritePost/>
   },
 ]);
 
