@@ -1,6 +1,6 @@
 import { Typography, Box, Container, Button } from '@mui/material';
 import {CustomButton} from './ui/button/CustomButton';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { setLoginState, loginState, saveAccessToken, saveLogged, removeAccessToken, removeRefreshToken } from '../utils/storage';
 import { useEffect, useState } from 'react';
 import CustomTypography from './ui/typography/CustomTypography';
@@ -8,7 +8,7 @@ import { useRecoilState } from 'recoil';
 import { boardState, userState } from '../utils/atom';
 import { axiosInstance } from '../utils/axios';
 import Loading from './ui/loading/Loading';
-import { CustomDialog } from './ui/dialog/CustomDialog';
+import { CustomDialog, CustomDialogContent, CustomDialogTitle } from './ui/dialog/CustomDialog';
 
 const Header = () =>{
 
@@ -18,6 +18,7 @@ const Header = () =>{
   const [boardList, setBoardList] = useRecoilState(boardState);
 
   const [loading, setLoading] = useState(false);
+  const [openBoardList, setOpenBoardList] = useState(false);
 
   useEffect(() =>{
     const pageOpen = async () => {
@@ -44,7 +45,7 @@ const Header = () =>{
     const getBoardList = async () => {
       try{
         const response = await axiosInstance.get(`/boards`);
-
+        response.data.shift();
         setBoardList({
           boardList: response.data
         });
@@ -114,8 +115,47 @@ const Header = () =>{
     navigate('/notice');
   }
 
-  const onClickPostButton = () => {
+  const onClickBoardListButton = () => {
+    setOpenBoardList(true);
+  }
 
+  const onClickBoardButton = (e, id) => {
+    e.preventDefault();
+
+    navigate('/post-list', {
+      state: {
+        boardId: id
+      }
+    })
+
+    setOpenBoardList(false);
+  }
+
+  const BoardListComponent = () => { 
+    return boardList.boardList.map(board =>(
+      <Box key={board.id} sx={{padding: '5px', borderBottomStyle: 'solid', borderWidth: '1px'}}>
+        <Link onClick={(e) => onClickBoardButton(e, board.id)}>
+          <CustomTypography sx={{display: 'inline-block', width: '100%', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap'}}>
+            {board.name}
+          </CustomTypography>
+        </Link>
+      </Box>      
+    ));
+  }
+
+  const onCloseBoardDialog = () => {
+    setOpenBoardList(false);
+  }
+
+  const BoardDialogComponent = () => {
+    return(
+      <CustomDialog open={openBoardList} onClose={onCloseBoardDialog}>
+        <CustomDialogTitle>게시판 목록</CustomDialogTitle>
+        <CustomDialogContent>
+          {boardList.boardList ? <BoardListComponent/> : null}
+        </CustomDialogContent>
+      </CustomDialog>
+    )
   }
 
   return(
@@ -130,11 +170,12 @@ const Header = () =>{
         <CustomButton onClick={onClickNoticeButton}>
           공지사항
         </CustomButton>
-        <CustomButton onClick={onClickPostButton}>
+        <CustomButton onClick={onClickBoardListButton}>
           게시판
         </CustomButton>
         {recoilState.isLoggedIn ? <LogoutButton/> : <LoginButton/>}
-      </Box>  
+      </Box>
+      <BoardDialogComponent/>
       <Loading open={loading}/>
     </Box>
   )
