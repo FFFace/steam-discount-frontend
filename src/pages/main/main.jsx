@@ -97,7 +97,7 @@ const Main = () => {
       <Box sx={{display: 'flex'}}>
         <Box sx={{display: 'flex', margin: 'auto'}}>
           <img src={discountList[itemNum].image}/>   
-          <CustomTypography sx={{margin: '10px 0px 5px 10px', width: '45%', display: 'inline-block', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap'}}>
+          <CustomTypography sx={{margin: '10px 0px 5px 10px', maxWidth: '15dvw', display: 'inline-block', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap'}}>
             {discountList[itemNum].name}
           </CustomTypography>          
         </Box>
