@@ -11,11 +11,12 @@ import Loading from "../../component/ui/loading/Loading"
 import { useRecoilState } from "recoil"
 import { userState } from "../../utils/atom"
 import { CustomDialog, CustomDialogContent, CustomDialogErrorTitle, CustomDialogTitle } from "../../component/ui/dialog/CustomDialog"
-import { CustomButton } from "../../component/ui/button/CustomButton"
+import { CustomButton, CustomButtonWhite } from "../../component/ui/button/CustomButton"
 import { Viewer } from "@toast-ui/react-editor"
 import '@toast-ui/editor/dist/theme/toastui-editor-dark.css';
-
-
+import { CustomTextField } from "../../component/ui/textField/CustomTextField"
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import { isMobile } from "react-device-detect"
 
 const Post = () => {
 
@@ -26,6 +27,10 @@ const Post = () => {
   const [postDetailInfo, setPostDetailInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [dialog, setDialog] = useState(false);
+  const [comment, setComment] = useState({
+    parentId: null,
+    contents: null
+  });
 
   const [recoilState, setRecoilState] = useRecoilState(userState);
 
@@ -149,6 +154,36 @@ const Post = () => {
     setDialog(false);
   }
 
+  const MoreHorizComponent = () => {
+    return (
+      <IconButton>
+        <MoreHorizIcon fontSize="large" sx={{color: 'var(--color4)'}}/>
+      </IconButton>
+    )
+  }
+
+  const onChangeComment = (e) => {
+    setComment({
+      ...comment,
+      [e.target.name]: [e.target.value]
+    });
+
+    console.log(comment);
+  }
+
+  const onClickCreateComment = async () => {
+    try{
+      await axiosInstance.post(`/posts/comment`, {
+        postId: postInfo.get('id'),
+        parentId: null,
+        content: null
+      });
+
+    } catch(exception){
+      console.log(exception);
+    }
+  }
+
   return(
     <Contents>
       <CustomBox>
@@ -159,9 +194,12 @@ const Post = () => {
         </Box>
       </CustomBox>
       <CustomBox>
-        <CustomTypography sx={{padding: '10px', fontSize: 'larger', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap'}}>
+        <CustomTypography sx={{padding: '10px', fontSize: 'larger', display: 'inline-block', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap'}}>
           {postInfo.get('name')}
         </CustomTypography>
+        <Box sx={{float: 'right'}}>
+          {isMobile && postInfo.get('writer') ? <MoreHorizComponent/> : null}
+        </Box>
         <Box>
           <CustomTypography sx={{display: 'inline-block', padding: '0px 0px 10px 10px'}}>
             작성자: {postInfo.get('writer')}
@@ -175,6 +213,37 @@ const Post = () => {
       <CustomBox>
         {postDetailInfo ? <ToastPostContentComponent/> : null}
         {postDetailInfo ? <PostThumbsComponent/> : null}
+        
+      </CustomBox>
+
+      <CustomBox>
+        <Box sx={{padding: '10px'}}>
+          <CustomTypography variant='h5' sx={{display: 'inline-block'}}>
+            전체 댓글
+          </CustomTypography>
+          <CustomTypography sx={{margin: '0px 0px 0px 5px', display: 'inline-block'}}>
+            (99개)
+          </CustomTypography>          
+        </Box>
+
+        <Box sx={{margin: '10px 0px', padding: '10px 0px', borderTopStyle: 'solid', borderBottomStyle: 'solid', borderWidth: '3px', borderColor: 'var(--color1)'}}>
+          <Box sx={{margin: '20px 0px 0px 0px', display: 'flex', textAlign: 'center', justifyContent: 'center', border: 'double 6px var(--color1)'}}>
+            <CustomButton fullWidth>
+              댓글 더 보기
+            </CustomButton>
+          </Box>
+        </Box>
+
+
+        <Box >
+          <CustomTextField name='contents' onChange={onChangeComment} multiline placeholder='여기서 댓글을 달아주세요.'/>
+
+          <Box sx={{margin: '-10px 0px 0px', display: 'flex', textAlign: 'center', justifyContent: 'right'}}>
+            <Box>
+              <CustomButton onClick={onClickCreateComment}>댓글 등록</CustomButton>
+            </Box>
+          </Box>
+        </Box>
       </CustomBox>
       <DialogError/>
       <Loading open={loading}/>
