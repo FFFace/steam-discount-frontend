@@ -11,11 +11,11 @@ import { createTheme, ThemeProvider } from '@mui/material';
 import UserRegister from './pages/user/UserRegister';
 import EmailValidation from './pages/user/EmailValidation';
 import { RecoilRoot } from 'recoil';
-import Notice from './pages/notice/Notice';
 import Post from './pages/post/Post';
 import WritePost from './pages/post/WritePost';
 import PostList from './pages/post/PostList';
 import Main from './pages/main/Main';
+import Board from './pages/board/Board';
 
 const theme = createTheme({
   typography: {
@@ -45,8 +45,8 @@ const bodyRouter = createBrowserRouter([
     element: <EmailValidation/>
   },
   {
-    path: '/notice',
-    element: <Notice/>
+    path: '/board',
+    element: <Board/>
   },
   {
     path: '/post-list',
