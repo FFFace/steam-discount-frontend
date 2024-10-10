@@ -9,8 +9,8 @@ export const CustomTextField = ({...props}) => {
       display: 'flex',
       ' .MuiOutlinedInput-root': {
         color: 'white',
-        border: 'solid 1px var(--color2)',
-        backgroundColor: 'black',
+        border: 'solid 1px var(--color1)',
+        backgroundColor: 'var(--color1)',
         '&.Mui-focused fieldset': {
           border: 'solid 2px gray'
         }
