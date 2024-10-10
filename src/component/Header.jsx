@@ -20,6 +20,23 @@ const Header = () =>{
   const [loading, setLoading] = useState(false);
   const [openBoardList, setOpenBoardList] = useState(false);
 
+  const getBoardList = async () => {
+    setLoading(true);
+
+    try{
+      const response = await axiosInstance.get(`/boards`);
+      response.data.shift();
+      setBoardList({
+        boardList: response.data
+      });
+
+    } catch(exception){
+      console.log(exception);
+    }
+
+    setLoading(false);
+  }
+
   useEffect(() =>{
     const pageOpen = async () => {
       try{
@@ -42,24 +59,8 @@ const Header = () =>{
       }
     }
 
-    const getBoardList = async () => {
-      try{
-        const response = await axiosInstance.get(`/boards`);
-        response.data.shift();
-        setBoardList({
-          boardList: response.data
-        });
-
-      } catch(exception){
-        console.log(exception);
-      }
-    }
-
     if(recoilState.isLoggedIn)
-      pageOpen();
-
-    if(!boardList.boardList)
-      getBoardList();      
+      pageOpen(); 
   }, []);
 
   const onClickDiscountList = () =>{
@@ -112,19 +113,31 @@ const Header = () =>{
   }
 
   const onClickNoticeButton = () => {
-    navigate('/notice');
+    navigate('/board', {
+      state: {
+        board: {
+          id: 1,
+          name: '공지사항'
+        }
+      }
+    });
   }
 
   const onClickBoardListButton = () => {
+    if(!boardList.boardList)
+    getBoardList();
     setOpenBoardList(true);
   }
 
-  const onClickBoardButton = (e, id) => {
+  const onClickBoardButton = (e, id, name) => {
     e.preventDefault();
 
-    navigate('/post-list', {
+    navigate(`/board`, {
       state: {
-        boardId: id
+        board: {
+          id: id,
+          name: name
+        }
       }
     })
 
@@ -134,7 +147,7 @@ const Header = () =>{
   const BoardListComponent = () => { 
     return boardList.boardList.map(board =>(
       <Box key={board.id} sx={{padding: '5px', borderBottomStyle: 'solid', borderWidth: '1px'}}>
-        <Link onClick={(e) => onClickBoardButton(e, board.id)}>
+        <Link onClick={(e) => onClickBoardButton(e, board.id, board.name)}>
           <CustomTypography sx={{display: 'inline-block', width: '100%', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap'}}>
             {board.name}
           </CustomTypography>
@@ -175,7 +188,7 @@ const Header = () =>{
         </CustomButton>
         {recoilState.isLoggedIn ? <LogoutButton/> : <LoginButton/>}
       </Box>
-      <BoardDialogComponent/>
+      {boardList.boardList ? <BoardDialogComponent/> : null}
       <Loading open={loading}/>
     </Box>
   )
