@@ -4,29 +4,33 @@ import { CustomBox } from "../../component/ui/box/CustomBox";
 import CustomTypography from "../../component/ui/typography/CustomTypography";
 import { useEffect, useState } from "react";
 import { axiosInstance } from "../../utils/axios";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import Loading from "../../component/ui/loading/Loading";
 import { CustomButton } from "../../component/ui/button/CustomButton";
 
 
 const NOTICE_BOARD_NUMBER = 1;
 
-const Notice = () => {
+const Board = () => {
 
   const [page, setPage] = useState(0);
   const [totalPage, setTotalPage] = useState(0);
   const [postList, setPostList] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const location = useLocation();
+  const board = location.state?.board;
+
   const navigate = useNavigate();
 
   useEffect(() => {
     setLoading(true);
+    setPostList(null);
     const getNoticeList = async () => {
       try{
         const response = await axiosInstance.get(`/posts`, {
           params:{
-            boardId: NOTICE_BOARD_NUMBER,
+            boardId: board.id,
             page: page
           }
         });
@@ -41,7 +45,7 @@ const Notice = () => {
     }
 
     getNoticeList();
-  }, []);
+  }, [board]);
 
   const PostListTypographyTitle = ({children}) => {
     return (
@@ -70,9 +74,14 @@ const Notice = () => {
   const PostListComponent = () =>{
     return postList.map(post => (
         <Box key={post.id} sx={{borderBottomStyle: 'solid', borderWidth: '3px', borderColor: 'var(--color1)'}}>
-          <Link onClick={(e)=>onClickNoticePost(e, post)} component='button'>
+          {/* <Link onClick={(e)=>onClickNoticePost(e, post)}>
             <PostListTypographyTitle>{post.name}</PostListTypographyTitle>
-          </Link>
+          </Link> */}
+
+          <a href={`/post?board-name=${board?.name}&id=${post.id}&name=${post.name}&writer=${post.writer}`} target="_blink">
+            <PostListTypographyTitle>{post.name}</PostListTypographyTitle>
+          </a>
+
 
           <Link>
             <PostListTypographyWriter>{post.writer}</PostListTypographyWriter>
@@ -87,8 +96,8 @@ const Notice = () => {
     navigate('/write-post', {
       state: {
         board: {
-         id: NOTICE_BOARD_NUMBER,
-         name: '공지사항' 
+         id: board.id,
+         name: board.name 
         }
       }
     })
@@ -108,7 +117,7 @@ const Notice = () => {
             글쓰기
           </Button>
           <CustomTypography variant='h5'>
-            공지사항
+            {board?.name}
           </CustomTypography>
         </Box>
       </CustomBox>
@@ -127,4 +136,4 @@ const Notice = () => {
   )
 }
 
-export default Notice;
+export default Board;
