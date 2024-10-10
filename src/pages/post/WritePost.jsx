@@ -89,7 +89,7 @@ const WritePost = () => {
 
         <Box sx={{margin: '10px 0px'}}>
           <CustomButtonWhite onClick={onClickWritePostButton}>
-            글 작성
+            글쓰기
           </CustomButtonWhite>
         </Box>
       </CustomBox>
