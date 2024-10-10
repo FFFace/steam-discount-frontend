@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import Contents from "../../component/Contents"
 import { CustomBox } from "../../component/ui/box/CustomBox"
 import CustomTypography from "../../component/ui/typography/CustomTypography"
-import { useLocation } from "react-router-dom"
+import { useLocation, useSearchParams } from "react-router-dom"
 import { Box, Button, DialogActions, IconButton } from "@mui/material"
 import { axiosInstance } from "../../utils/axios"
 import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
@@ -20,7 +20,8 @@ import '@toast-ui/editor/dist/theme/toastui-editor-dark.css';
 const Post = () => {
 
   const location = useLocation();
-  const postInfo = location.state?.post;
+  // const postInfo = location.state?.post;
+  const [postInfo, setPostInfo] = useSearchParams();
 
   const [postDetailInfo, setPostDetailInfo] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -33,7 +34,7 @@ const Post = () => {
     const getContent = async () => {
       
       try{
-        const response = (await axiosInstance.get(`/posts/${postInfo.id}`)).data;
+        const response = (await axiosInstance.get(`/posts/${postInfo.get('id')}`)).data;
         setPostDetailInfo(response);
 
       } catch(exception){
@@ -110,7 +111,7 @@ const Post = () => {
   const reqeustThumbs = async (thumbs) => {
     setLoading(true);
     try{
-      const response = await axiosInstance.post(`posts/${postInfo.id}/${thumbs}`);
+      const response = await axiosInstance.post(`posts/${postInfo.get('id')}/${thumbs}`);
 
       setPostDetailInfo({
         ...postDetailInfo,
@@ -153,17 +154,17 @@ const Post = () => {
       <CustomBox>
         <Box sx={{padding: '10px'}}>
           <CustomTypography variant='h5'>
-            공지사항
+            {postInfo.get('board-name')}
           </CustomTypography>
         </Box>
       </CustomBox>
       <CustomBox>
         <CustomTypography sx={{padding: '10px', fontSize: 'larger', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap'}}>
-          {postInfo ? postInfo.name : null}
+          {postInfo.get('name')}
         </CustomTypography>
         <Box>
           <CustomTypography sx={{display: 'inline-block', padding: '0px 0px 10px 10px'}}>
-            작성자: {postInfo ? postInfo.writer : null}
+            작성자: {postInfo.get('writer')}
           </CustomTypography>
           <CustomTypography sx={{display: 'inline-block', padding: '0px 10px 10px 0px', float: 'right'}}>
             작성일: {postDetailInfo ? postDetailInfo.createdAt : null}
