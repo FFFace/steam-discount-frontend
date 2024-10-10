@@ -63,7 +63,7 @@ const WritePost = () => {
   const onClickWritePostButton = async () => {
     try{
       await axiosInstance.post(`/posts`, {
-        boardId: 1,
+        boardId: board.id,
         name: postNameRef.current?.value,
         content: editorRef.current?.getInstance().getMarkdown()
       });
@@ -77,7 +77,7 @@ const WritePost = () => {
       <CustomBox>
         <Box sx={{padding: '10px'}}>
           <CustomTypography variant='h5'>
-            공지사항
+            {board.name}
           </CustomTypography>
         </Box>
       </CustomBox>
