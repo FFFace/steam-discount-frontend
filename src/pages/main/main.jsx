@@ -12,6 +12,8 @@ import { userState } from "../../utils/atom";
 import { useRecoilState } from "recoil";
 import { saveAccessToken } from "../../utils/storage";
 import { Link, useNavigate } from "react-router-dom";
+import styled from "styled-components";
+import { CustomLink } from "../../component/ui/Link/CustomLink";
 
 const DISCOUNT_SAMPLE_MAX_COUNT = 4;
 
@@ -32,7 +34,7 @@ const Main = () => {
       try{
         const response = await axiosInstance.get(`/discount-five`);
 
-        setDiscountList(response.data);         
+        setDiscountList(response.data);
 
       } catch(exception){
 
@@ -82,26 +84,28 @@ const Main = () => {
 
   const NoticeComponent = () => {
     return(
-      <Link component='button' onClick={onClickMainNoticeButton}>
+      <CustomLink href={`/post?board-name=공지사항&id=${notice.id}&name=${notice.name}&writer=${notice.writer}`} target="_blink">
         <Box>
           <CustomTypography sx={{display: 'inline-block'}}>
             {notice.name}
           </CustomTypography>
         </Box>
-      </Link>
+      </CustomLink>
     )
   }
 
   const DiscountTitle = () => {
     return (
-      <Box sx={{display: 'flex'}}>
-        <Box sx={{display: 'flex', margin: 'auto'}}>
-          <img src={discountList[itemNum].image}/>   
-          <CustomTypography sx={{margin: '10px 0px 5px 10px', maxWidth: '15dvw', display: 'inline-block', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap'}}>
-            {discountList[itemNum].name}
-          </CustomTypography>          
+      <CustomLink href={discountList[itemNum].link} target='_blank'>
+        <Box sx={{display: 'flex'}}>
+          <Box sx={{display: 'flex', margin: 'auto'}}>
+            <img src={discountList[itemNum].image}/>   
+            <CustomTypography sx={{margin: '10px 0px 5px 10px', maxWidth: '15dvw', display: 'inline-block', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap'}}>
+              {discountList[itemNum].name}
+            </CustomTypography>    
+          </Box>
         </Box>
-      </Box>
+      </CustomLink>      
     )
   }
 
