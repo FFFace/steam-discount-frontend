@@ -71,6 +71,11 @@ const Board = () => {
     )   
   }
 
+  const onClickPost = (e, post) => {
+    e.preventDefault();
+    window.open(`/post?board-name=${board?.name}&id=${post.id}&name=${post.name}&writer=${post.writer}`, '_blank', 'noopener,noreferrer');
+  }
+
   const PostListComponent = () =>{
     return postList.map(post => (
         <Box key={post.id} sx={{borderBottomStyle: 'solid', borderWidth: '3px', borderColor: 'var(--color1)'}}>
@@ -78,14 +83,12 @@ const Board = () => {
             <PostListTypographyTitle>{post.name}</PostListTypographyTitle>
           </Link> */}
 
-          <a href={`/post?board-name=${board?.name}&id=${post.id}&name=${post.name}&writer=${post.writer}`} target="_blink">
+          <Link onClick={(e) => onClickPost(e, post)}>
             <PostListTypographyTitle>{post.name}</PostListTypographyTitle>
-          </a>
-
-
-          <Link>
-            <PostListTypographyWriter>{post.writer}</PostListTypographyWriter>
           </Link>
+
+
+          <PostListTypographyWriter>{post.writer}</PostListTypographyWriter>
 
           <PostListTypographyThumbs>{post.thumbsUp}</PostListTypographyThumbs>
         </Box>

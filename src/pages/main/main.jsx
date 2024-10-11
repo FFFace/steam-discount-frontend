@@ -73,23 +73,15 @@ const Main = () => {
     }
   }
 
-  const onClickMainNoticeButton = (e) => {
+  const onClickNewNotice = (e) => {
     e.preventDefault();
-    navigate('/post', {
-      state: {
-        post: notice
-      }
-    })
+    window.open(e.target.href, '_blank', 'noopener,noreferrer')
   }
 
   const NoticeComponent = () => {
     return(
-      <CustomLink href={`/post?board-name=공지사항&id=${notice.id}&name=${notice.name}&writer=${notice.writer}`} target="_blink">
-        <Box>
-          <CustomTypography sx={{display: 'inline-block'}}>
-            {notice.name}
-          </CustomTypography>
-        </Box>
+      <CustomLink href={`/post?board-name=공지사항&id=${notice.id}&name=${notice.name}&writer=${notice.writer}`} target="_blink" onClick={onClickNewNotice}>
+        {notice.name}
       </CustomLink>
     )
   }

@@ -184,6 +184,16 @@ const Post = () => {
     }
   }
 
+  const MoreCommentComponent = () => {
+    return (
+      <Box sx={{margin: '20px 0px 0px 0px', display: 'flex', textAlign: 'center', justifyContent: 'center', border: 'double 6px var(--color1)'}}>
+        <CustomButton fullWidth>
+          댓글 더 보기
+        </CustomButton>
+      </Box>
+    )
+  }
+
   return(
     <Contents>
       <CustomBox>
@@ -227,13 +237,9 @@ const Post = () => {
         </Box>
 
         <Box sx={{margin: '10px 0px', padding: '10px 0px', borderTopStyle: 'solid', borderBottomStyle: 'solid', borderWidth: '3px', borderColor: 'var(--color1)'}}>
-          <Box sx={{margin: '20px 0px 0px 0px', display: 'flex', textAlign: 'center', justifyContent: 'center', border: 'double 6px var(--color1)'}}>
-            <CustomButton fullWidth>
-              댓글 더 보기
-            </CustomButton>
-          </Box>
+          <MoreCommentComponent/>
         </Box>
-
+          
 
         <Box >
           <CustomTextField name='contents' onChange={onChangeComment} multiline placeholder='여기서 댓글을 달아주세요.'/>

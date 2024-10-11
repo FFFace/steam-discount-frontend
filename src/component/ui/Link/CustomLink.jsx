@@ -2,5 +2,12 @@ import styled from "styled-components";
 
 
 export const CustomLink = styled.a`
-color: var(--color2)
+  width: 60%;
+  color: var(--color4);
+  text-decoration: none;
 `
+
+export const onClickCustomLink = (e) => {
+  e.preventDefault();
+  window.open(e.target.href, '_blank', 'noopener,noreferrer');
+};
