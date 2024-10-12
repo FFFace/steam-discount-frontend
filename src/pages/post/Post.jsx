@@ -19,9 +19,6 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { isMobile } from "react-device-detect"
 
 const Post = () => {
-
-  const location = useLocation();
-  // const postInfo = location.state?.post;
   const [postInfo, setPostInfo] = useSearchParams();
 
   const [postDetailInfo, setPostDetailInfo] = useState(null);
@@ -29,14 +26,40 @@ const Post = () => {
   const [dialog, setDialog] = useState(false);
   const [comment, setComment] = useState({
     parentId: null,
-    contents: null
+    content: null
+  });
+  const [commentInfo, setCommentInfo] = useState({
+      commentList: null,
+      currentPage: 0,
+      totalPage: 0,
   });
 
   const [recoilState, setRecoilState] = useRecoilState(userState);
+  
+  const getCommentList = async () => {
+    try{
+      const response = await axiosInstance.get(`/posts/comments`, {
+        params: {
+          postId: postInfo.get('id'),
+          page: commentInfo.currentPage
+        }
+      });
+
+      setCommentInfo({
+        ...commentInfo,
+
+        commentList: response.data.commentResponseDTOList,
+        totalPage: response.data.totalPage
+      })
+
+    } catch(exception){
+      console.log(exception);
+    }
+  }
 
   useEffect(()=>{
     setLoading(true);
-    const getContent = async () => {
+    const getPost = async () => {
       
       try{
         const response = (await axiosInstance.get(`/posts/${postInfo.get('id')}`)).data;
@@ -47,18 +70,10 @@ const Post = () => {
       }
       setLoading(false);
     }
-    getContent();
-  }, [])
 
-  const PostContentComponent = () => {
-    return(
-      <Box sx={{padding: '10px'}}>
-        <CustomTypography>
-          {postDetailInfo.content}
-        </CustomTypography>
-      </Box>
-    )
-  }
+    getPost();
+    getCommentList();
+  }, [])
 
   const ToastPostContentComponent = () => {
     return(
@@ -165,18 +180,16 @@ const Post = () => {
   const onChangeComment = (e) => {
     setComment({
       ...comment,
-      [e.target.name]: [e.target.value]
+      [e.target.name]: e.target.value
     });
-
-    console.log(comment);
   }
 
   const onClickCreateComment = async () => {
     try{
-      await axiosInstance.post(`/posts/comment`, {
+      await axiosInstance.post(`/posts/comments`, {
         postId: postInfo.get('id'),
-        parentId: null,
-        content: null
+        parentId: comment.parentId,
+        content: comment.content
       });
 
     } catch(exception){
@@ -192,6 +205,30 @@ const Post = () => {
         </CustomButton>
       </Box>
     )
+  }
+
+  const CommentListComponent = () => {
+    const state = {
+      nicknameWidth: '20%',
+      contentWidth: '60%',
+      dateWidth: '20%'
+    }
+
+    return commentInfo.commentList.map(comment => (
+      <Box key={comment.id} sx={{display: 'flex', margin: '0px 0px 8px 0px', padding: '0px 0px 8px 0px', borderBottomStyle: 'solid', borderWidth: '2px', borderColor: 'var(--color1)'}}>
+        <CustomTypography sx={{width: state.nicknameWidth, display: 'inline-block', alignContent: 'center'}}>
+          {comment.writer}
+        </CustomTypography>
+
+        <CustomTypography sx={{width: state.contentWidth, display: 'inline-block', whiteSpace: 'pre-line'}}>
+          {comment.content}
+        </CustomTypography>
+
+        <CustomTypography sx={{width: state.dateWidth, display: 'inline-block', textAlign: 'right', alignContent: 'center'}}>
+          {comment.createdAt}
+        </CustomTypography>
+      </Box>
+    ))
   }
 
   return(
@@ -237,12 +274,15 @@ const Post = () => {
         </Box>
 
         <Box sx={{margin: '10px 0px', padding: '10px 0px', borderTopStyle: 'solid', borderBottomStyle: 'solid', borderWidth: '3px', borderColor: 'var(--color1)'}}>
+          <Box sx={{padding: '0px 10px 0px 10px'}}>
+            {commentInfo.commentList ? <CommentListComponent/> : null}
+          </Box>
           <MoreCommentComponent/>
         </Box>
           
 
         <Box >
-          <CustomTextField name='contents' onChange={onChangeComment} multiline placeholder='여기서 댓글을 달아주세요.'/>
+          <CustomTextField name='content' onChange={onChangeComment} multiline placeholder='여기서 댓글을 달아주세요.'/>
 
           <Box sx={{margin: '-10px 0px 0px', display: 'flex', textAlign: 'center', justifyContent: 'right'}}>
             <Box>
