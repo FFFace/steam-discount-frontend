@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import Contents from "../../component/Contents"
 import { CustomBox } from "../../component/ui/box/CustomBox"
 import CustomTypography from "../../component/ui/typography/CustomTypography"
@@ -14,9 +14,25 @@ import { CustomDialog, CustomDialogContent, CustomDialogErrorTitle, CustomDialog
 import { CustomButton, CustomButtonWhite } from "../../component/ui/button/CustomButton"
 import { Viewer } from "@toast-ui/react-editor"
 import '@toast-ui/editor/dist/theme/toastui-editor-dark.css';
-import { CustomTextField } from "../../component/ui/textField/CustomTextField"
+import { CustomTextField, CustomTextFieldComment, CustomTextFieldComment1, CustomTextFieldComment2, CustomTextFieldComment3 } from "../../component/ui/textField/CustomTextField"
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { isMobile } from "react-device-detect"
+
+const pcState = {
+  nicknameWidth: '20%',
+  contentWidth: '60%',
+  dateWidth: '20%',
+  moreReply: '33%'
+}
+
+const mobileState = {
+  nicknameWidth: '20%',
+  contentWidth: '80%',
+  dateWidth: '0',
+  moreReply: '46%'
+}
+
+const deviceState = isMobile ? mobileState : pcState;
 
 const Post = () => {
   const [postInfo, setPostInfo] = useSearchParams();
@@ -24,10 +40,7 @@ const Post = () => {
   const [postDetailInfo, setPostDetailInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [dialog, setDialog] = useState(false);
-  const [comment, setComment] = useState({
-    parentId: null,
-    content: null
-  });
+  
   const [commentInfo, setCommentInfo] = useState({
       commentList: null,
       currentPage: 0,
@@ -35,6 +48,8 @@ const Post = () => {
   });
 
   const [recoilState, setRecoilState] = useRecoilState(userState);
+
+  const commentRef = useRef();
   
   const getCommentList = async () => {
     try{
@@ -60,7 +75,6 @@ const Post = () => {
   useEffect(()=>{
     setLoading(true);
     const getPost = async () => {
-      
       try{
         const response = (await axiosInstance.get(`/posts/${postInfo.get('id')}`)).data;
         setPostDetailInfo(response);
@@ -177,26 +191,6 @@ const Post = () => {
     )
   }
 
-  const onChangeComment = (e) => {
-    setComment({
-      ...comment,
-      [e.target.name]: e.target.value
-    });
-  }
-
-  const onClickCreateComment = async () => {
-    try{
-      await axiosInstance.post(`/posts/comments`, {
-        postId: postInfo.get('id'),
-        parentId: comment.parentId,
-        content: comment.content
-      });
-
-    } catch(exception){
-      console.log(exception);
-    }
-  }
-
   const MoreCommentComponent = () => {
     return (
       <Box sx={{margin: '20px 0px 0px 0px', display: 'flex', textAlign: 'center', justifyContent: 'center', border: 'double 6px var(--color1)'}}>
@@ -208,27 +202,179 @@ const Post = () => {
   }
 
   const CommentListComponent = () => {
-    const state = {
-      nicknameWidth: '20%',
-      contentWidth: '60%',
-      dateWidth: '20%'
+    return commentInfo.commentList.map(comment => (
+      <Box key={comment.id} sx={{margin: '0px 0px 8px 0px', padding: '0px 0px 8px 0px', borderBottomStyle: 'solid', borderWidth: '2px', borderColor: 'var(--color1)'}}>
+        <Box sx={{display: 'flex'}}>
+          <CustomTypography sx={{width: deviceState.nicknameWidth, display: 'inline-block', alignContent: 'center'}}>
+            {comment.writer}
+          </CustomTypography>
+
+          <CustomTypography sx={{width: deviceState.contentWidth, display: 'inline-block', whiteSpace: 'pre-line'}}>
+            {comment.content}
+          </CustomTypography>
+
+          {isMobile ? null : 
+            <CustomTypography sx={{width: deviceState.dateWidth, display: 'inline-block', textAlign: 'right', alignContent: 'center'}}>
+              {comment.createdAt}
+            </CustomTypography>}
+
+        </Box>
+
+        <Box sx={{margin: '8px 0px -5px 0px'}}>
+          <IconButton sx={{margin: '0px 0px 0px 19%'}}>
+            <ThumbUpAltIcon sx={{color: 'var(--color4)'}}/>
+          </IconButton>
+          <CustomTypography sx={{display: 'inline-block'}}>{comment.thumbsUp}</CustomTypography>
+
+          <IconButton sx={{margin: '0px 0px 0px 15px'}}>
+            <ThumbDownAlt sx={{color: 'var(--color4)'}}/>
+          </IconButton>
+          <CustomTypography sx={{display: 'inline-block'}}>{comment.thumbsDown}</CustomTypography>
+          <ReplyCommentComponent comment={comment} parentId={comment.id} depth={1}/>
+        </Box>
+      </Box>
+
+    ))
+  }
+
+  const ReplyCommentComponent = ({comment, parentId, depth}) => {
+    const [display, setDisplay] = useState(false);
+    const [reply, setReply] = useState(null);
+    const [replyDisplay, setReplyDisplay] = useState(false);
+    const onClickCommendButton = (e) => {
+      e.preventDefault();
+      setDisplay(!display)
+    };
+
+    const onClickMoreReplyButton = async () => {
+
+      try{
+        const response = await axiosInstance.get('/posts/comments/reply', {
+          params: {
+            parentId: parentId,
+            page: reply?.currentPage+1
+          }
+        })
+
+        let replyList = reply?.replyList;
+        replyList.push(...response.data.commentResponseDTOList);
+        const currentPage = reply?.currentPage+1;
+        setReply({
+          ...reply,
+          replyList: replyList,
+          currentPage: currentPage
+        });
+      } catch(exception){ 
+        console.log(exception);
+      }
+    };
+
+    useEffect(() => {
+      setReply({
+        replyList: comment?.replyCommentPageResponseDTO?.commentResponseDTOList,
+        currentPage: 0,
+        totalPage: comment?.replyCommentPageResponseDTO?.totalPage
+      });
+    }, []);
+    
+    return (
+      <> 
+        <Box sx={{display: 'inline-block'}}>
+          <CustomButton onClick={(e) => onClickCommendButton(e)}>
+            답글
+          </CustomButton>
+        </Box>
+        {display ? <CommentTextFieldComponent parentId={parentId} depth={depth} defaultValue={`@${comment.writer} `} /> : null}
+        
+        <Box sx={{width: deviceState.moreReply, textAlign: 'right'}}>
+          {reply?.replyList?.length > 0 && !replyDisplay ?
+          <CustomButton onClick={()=>setReplyDisplay(!replyDisplay)}>
+            답글 펼치기
+          </CustomButton> : reply?.replyList?.length > 0 && replyDisplay ? 
+          <CustomButton onClick={() => setReplyDisplay(!replyDisplay)}>
+            답글 접기
+          </CustomButton> : null}
+        </Box>        
+        {replyDisplay ? <MoreReplyComponent replyList={reply?.replyList} parentId={comment.id}/> : null}
+        {replyDisplay &&  reply?.currentPage+1 < reply?.totalPage ? 
+        <Box sx={{margin: '10px 0px 10px 0px', display: 'flex', textAlign: 'center', justifyContent: 'center'}}>
+          <CustomButton onClick={onClickMoreReplyButton}>
+            답글 더 보기
+          </CustomButton>
+        </Box> : null}
+      </>
+
+    )
+  }
+
+  const MoreReplyComponent = ({replyList, parentId}) => {
+      return replyList.map(reply => (
+      <Box key={reply.id} sx={{margin: '8px 0px 0px 0px', padding: '8px 8px 8px 50px', borderTopStyle: 'solid', borderWidth: '2px', borderColor: 'var(--color1)', backgroundColor: 'var(--color1)'}}>
+        <Box sx={{display: 'flex'}}>
+          <CustomTypography sx={{width: deviceState.nicknameWidth, display: 'inline-block', alignContent: 'center'}}>
+            {reply.writer}
+          </CustomTypography>
+
+          <CustomTypography sx={{width: deviceState.contentWidth, display: 'inline-block', whiteSpace: 'pre-line'}}>
+            {reply.content}
+          </CustomTypography>
+
+          {isMobile ? null : 
+            <CustomTypography sx={{width: deviceState.dateWidth, display: 'inline-block', textAlign: 'right', alignContent: 'center'}}>
+              {reply.createdAt}
+            </CustomTypography>}
+
+        </Box>
+
+        <Box sx={{margin: '8px 0px -5px 0px'}}>
+          <IconButton sx={{margin: '0px 0px 0px 19%'}}>
+            <ThumbUpAltIcon sx={{color: 'var(--color4)'}}/>
+          </IconButton>
+          <CustomTypography sx={{display: 'inline-block'}}>{reply.thumbsUp}</CustomTypography>
+
+          <IconButton sx={{margin: '0px 0px 0px 15px'}}>
+            <ThumbDownAlt sx={{color: 'var(--color4)'}}/>
+          </IconButton>
+          <CustomTypography sx={{display: 'inline-block'}}>{reply.thumbsDown}</CustomTypography>
+          <ReplyCommentComponent comment={reply} parentId={parentId} depth={2}/>
+        </Box>
+      </Box>
+      ));
+  }
+
+  const CommentTextFieldComponent = ({parentId, depth, defaultValue}) => {
+
+    const onClickCreateComment = async () => {
+      setLoading(true);
+      try{
+        await axiosInstance.post(`/posts/comments`, {
+          postId: postInfo.get('id'),
+          parentId: parentId,
+          content: commentRef.current?.value
+        });
+        
+        getCommentList();
+      } catch(exception){
+        console.log(exception);
+      }
+
+      setLoading(false);
     }
 
-    return commentInfo.commentList.map(comment => (
-      <Box key={comment.id} sx={{display: 'flex', margin: '0px 0px 8px 0px', padding: '0px 0px 8px 0px', borderBottomStyle: 'solid', borderWidth: '2px', borderColor: 'var(--color1)'}}>
-        <CustomTypography sx={{width: state.nicknameWidth, display: 'inline-block', alignContent: 'center'}}>
-          {comment.writer}
-        </CustomTypography>
+    return(
+      <Box >
+        {depth == 0 ? <CustomTextFieldComment1 key='content' name='content' inputRef={commentRef} multiline placeholder='여기서 댓글을 달아주세요.' defaultValue={defaultValue}/> :
+          depth == 1 ? <CustomTextFieldComment2 key='content' name='content' inputRef={commentRef} multiline placeholder='여기서 댓글을 달아주세요.' defaultValue={defaultValue}/> :
+          <CustomTextFieldComment3 key='content' name='content' inputRef={commentRef} multiline placeholder='여기서 댓글을 달아주세요.' defaultValue={defaultValue}/>}
+        
 
-        <CustomTypography sx={{width: state.contentWidth, display: 'inline-block', whiteSpace: 'pre-line'}}>
-          {comment.content}
-        </CustomTypography>
-
-        <CustomTypography sx={{width: state.dateWidth, display: 'inline-block', textAlign: 'right', alignContent: 'center'}}>
-          {comment.createdAt}
-        </CustomTypography>
-      </Box>
-    ))
+        <Box sx={{margin: '-10px 0px 0px', display: 'flex', textAlign: 'center', justifyContent: 'right'}}>
+          <Box>
+            <CustomButton onClick={onClickCreateComment}>댓글 등록</CustomButton>
+          </Box>
+        </Box>
+    </Box>
+    )
   }
 
   return(
@@ -279,17 +425,8 @@ const Post = () => {
           </Box>
           <MoreCommentComponent/>
         </Box>
-          
-
-        <Box >
-          <CustomTextField name='content' onChange={onChangeComment} multiline placeholder='여기서 댓글을 달아주세요.'/>
-
-          <Box sx={{margin: '-10px 0px 0px', display: 'flex', textAlign: 'center', justifyContent: 'right'}}>
-            <Box>
-              <CustomButton onClick={onClickCreateComment}>댓글 등록</CustomButton>
-            </Box>
-          </Box>
-        </Box>
+        
+        <CommentTextFieldComponent depth={0}/>
       </CustomBox>
       <DialogError/>
       <Loading open={loading}/>
