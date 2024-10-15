@@ -22,14 +22,14 @@ const pcState = {
   nicknameWidth: '20%',
   contentWidth: '60%',
   dateWidth: '20%',
-  moreReply: '33%'
+  moreReply: '42%'
 }
 
 const mobileState = {
   nicknameWidth: '20%',
   contentWidth: '80%',
   dateWidth: '0',
-  moreReply: '46%'
+  moreReply: '66%'
 }
 
 const deviceState = isMobile ? mobileState : pcState;
@@ -41,29 +41,28 @@ const Post = () => {
   const [loading, setLoading] = useState(false);
   const [dialog, setDialog] = useState(false);
   
-  const [commentInfo, setCommentInfo] = useState({
-      commentList: null,
-      currentPage: 0,
-      totalPage: 0,
-  });
+  const [commentInfo, setCommentInfo] = useState(null);
 
   const [recoilState, setRecoilState] = useRecoilState(userState);
 
   const commentRef = useRef();
   
-  const getCommentList = async () => {
+  const getCommentList = async (page) => {
     try{
+      console.log(page);
       const response = await axiosInstance.get(`/posts/comments`, {
         params: {
           postId: postInfo.get('id'),
-          page: commentInfo.currentPage
+          page: page
         }
       });
 
-      setCommentInfo({
-        ...commentInfo,
+      let commentList = commentInfo?.commentList;
+      commentList ? commentList.push(...response.data.commentResponseDTOList) : commentList=response.data.commentResponseDTOList;
 
-        commentList: response.data.commentResponseDTOList,
+      setCommentInfo({
+        commentList: commentList,
+        currentPage: page,
         totalPage: response.data.totalPage
       })
 
@@ -76,8 +75,8 @@ const Post = () => {
     setLoading(true);
     const getPost = async () => {
       try{
-        const response = (await axiosInstance.get(`/posts/${postInfo.get('id')}`)).data;
-        setPostDetailInfo(response);
+        const response = await axiosInstance.get(`/posts/${postInfo.get('id')}`);
+        setPostDetailInfo(response.data);
 
       } catch(exception){
 
@@ -86,7 +85,12 @@ const Post = () => {
     }
 
     getPost();
-    getCommentList();
+
+    setCommentInfo({
+      currentPage: 0
+    });
+
+    getCommentList(0);
   }, [])
 
   const ToastPostContentComponent = () => {
@@ -191,14 +195,19 @@ const Post = () => {
     )
   }
 
+  const onClickMoreComment = (e) => {
+    e.preventDefault();
+    
+    const page = commentInfo?.currentPage + 1;
+    getCommentList(page);
+  }
+
   const MoreCommentComponent = () => {
     return (
       <Box sx={{margin: '20px 0px 0px 0px', display: 'flex', textAlign: 'center', justifyContent: 'center', border: 'double 6px var(--color1)'}}>
-        <CustomButton fullWidth>
-          댓글 더 보기
-        </CustomButton>
+        <CustomButton fullWidth onClick={onClickMoreComment}>댓글 더 보기</CustomButton>
       </Box>
-    )
+    );
   }
 
   const CommentListComponent = () => {
@@ -221,15 +230,6 @@ const Post = () => {
         </Box>
 
         <Box sx={{margin: '8px 0px -5px 0px'}}>
-          <IconButton sx={{margin: '0px 0px 0px 19%'}}>
-            <ThumbUpAltIcon sx={{color: 'var(--color4)'}}/>
-          </IconButton>
-          <CustomTypography sx={{display: 'inline-block'}}>{comment.thumbsUp}</CustomTypography>
-
-          <IconButton sx={{margin: '0px 0px 0px 15px'}}>
-            <ThumbDownAlt sx={{color: 'var(--color4)'}}/>
-          </IconButton>
-          <CustomTypography sx={{display: 'inline-block'}}>{comment.thumbsDown}</CustomTypography>
           <ReplyCommentComponent comment={comment} parentId={comment.id} depth={1}/>
         </Box>
       </Box>
@@ -279,21 +279,23 @@ const Post = () => {
     
     return (
       <> 
-        <Box sx={{display: 'inline-block'}}>
-          <CustomButton onClick={(e) => onClickCommendButton(e)}>
-            답글
-          </CustomButton>
-        </Box>
         {display ? <CommentTextFieldComponent parentId={parentId} depth={depth} defaultValue={`@${comment.writer} `} /> : null}
         
-        <Box sx={{width: deviceState.moreReply, textAlign: 'right'}}>
-          {reply?.replyList?.length > 0 && !replyDisplay ?
-          <CustomButton onClick={()=>setReplyDisplay(!replyDisplay)}>
-            답글 펼치기
-          </CustomButton> : reply?.replyList?.length > 0 && replyDisplay ? 
-          <CustomButton onClick={() => setReplyDisplay(!replyDisplay)}>
-            답글 접기
-          </CustomButton> : null}
+        <Box sx={{textAlign: 'right'}}>
+          <Box sx={{display: 'inline-block'}}>
+
+            {reply?.replyList?.length > 0 && !replyDisplay ?
+            <CustomButton onClick={()=>setReplyDisplay(!replyDisplay)}>
+              답글 펼치기
+            </CustomButton> : reply?.replyList?.length > 0 && replyDisplay ? 
+            <CustomButton onClick={() => setReplyDisplay(!replyDisplay)}>
+              답글 접기
+            </CustomButton> : null}
+
+            {display ? <CustomButton onClick={(e) => onClickCommendButton(e)}>취소</CustomButton> :
+              <CustomButton onClick={(e) => onClickCommendButton(e)}>답글</CustomButton>}
+
+          </Box>
         </Box>        
         {replyDisplay ? <MoreReplyComponent replyList={reply?.replyList} parentId={comment.id}/> : null}
         {replyDisplay &&  reply?.currentPage+1 < reply?.totalPage ? 
@@ -353,7 +355,7 @@ const Post = () => {
           content: commentRef.current?.value
         });
         
-        getCommentList();
+        getCommentList(commentInfo.currentPage);
       } catch(exception){
         console.log(exception);
       }
@@ -361,12 +363,38 @@ const Post = () => {
       setLoading(false);
     }
 
+    const CommentInputFieldDepth0 = ({disable}) => {
+      return(
+        <>
+          {disable ? <CustomTextFieldComment1 key='content' name='content' inputRef={commentRef} multiline placeholder='여기서 댓글을 달아주세요.' defaultValue={defaultValue}/> :
+            <CustomTextFieldComment1 disabled key='content' name='content' inputRef={commentRef} multiline placeholder='여기서 댓글을 달아주세요.' defaultValue={defaultValue}/> }
+        </>        
+      )
+    }
+
+    const CommentInputFieldDepth1 = ({disable}) => {
+      return(
+        <>
+          {disable ? <CustomTextFieldComment2 key='content' name='content' inputRef={commentRef} multiline placeholder='여기서 댓글을 달아주세요.' defaultValue={defaultValue}/> :
+            <CustomTextFieldComment2 disabled key='content' name='content' inputRef={commentRef} multiline placeholder='여기서 댓글을 달아주세요.' defaultValue={defaultValue}/> }
+        </>        
+      )
+    }
+
+    const CommentInputFieldDepth2 = ({disable}) => {
+      return(
+        <>
+          {disable ? <CustomTextFieldComment3 key='content' name='content' inputRef={commentRef} multiline placeholder='여기서 댓글을 달아주세요.' defaultValue={defaultValue}/> :
+            <CustomTextFieldComment3 disabled key='content' name='content' inputRef={commentRef} multiline placeholder='여기서 댓글을 달아주세요.' defaultValue={defaultValue}/> }
+        </>        
+      )
+    }
+
     return(
       <Box >
-        {depth == 0 ? <CustomTextFieldComment1 key='content' name='content' inputRef={commentRef} multiline placeholder='여기서 댓글을 달아주세요.' defaultValue={defaultValue}/> :
-          depth == 1 ? <CustomTextFieldComment2 key='content' name='content' inputRef={commentRef} multiline placeholder='여기서 댓글을 달아주세요.' defaultValue={defaultValue}/> :
-          <CustomTextFieldComment3 key='content' name='content' inputRef={commentRef} multiline placeholder='여기서 댓글을 달아주세요.' defaultValue={defaultValue}/>}
-        
+        {depth == 0 ? <CommentInputFieldDepth0 disable={recoilState.isLoggedIn}/> :
+          depth == 1 ? <CommentInputFieldDepth1 disable={recoilState.isLoggedIn}/> :
+            <CommentInputFieldDepth2 disable={recoilState.isLoggedIn}/>}        
 
         <Box sx={{margin: '-10px 0px 0px', display: 'flex', textAlign: 'center', justifyContent: 'right'}}>
           <Box>
@@ -421,9 +449,9 @@ const Post = () => {
 
         <Box sx={{margin: '10px 0px', padding: '10px 0px', borderTopStyle: 'solid', borderBottomStyle: 'solid', borderWidth: '3px', borderColor: 'var(--color1)'}}>
           <Box sx={{padding: '0px 10px 0px 10px'}}>
-            {commentInfo.commentList ? <CommentListComponent/> : null}
+            {commentInfo?.commentList ? <CommentListComponent/> : null}
           </Box>
-          <MoreCommentComponent/>
+          {commentInfo?.totalPage > commentInfo?.currentPage+1 ? <MoreCommentComponent/> : null}
         </Box>
         
         <CommentTextFieldComponent depth={0}/>
