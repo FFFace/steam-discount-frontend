@@ -49,7 +49,6 @@ const Post = () => {
   
   const getCommentList = async (page) => {
     try{
-      console.log(page);
       const response = await axiosInstance.get(`/posts/comments`, {
         params: {
           postId: postInfo.get('id'),
@@ -90,7 +89,8 @@ const Post = () => {
       currentPage: 0
     });
 
-    getCommentList(0);
+    if(!commentInfo)
+      getCommentList(0);
   }, [])
 
   const ToastPostContentComponent = () => {
@@ -349,13 +349,19 @@ const Post = () => {
     const onClickCreateComment = async () => {
       setLoading(true);
       try{
-        await axiosInstance.post(`/posts/comments`, {
-          postId: postInfo.get('id'),
-          parentId: parentId,
-          content: commentRef.current?.value
-        });
-        
-        getCommentList(commentInfo.currentPage);
+          const response = await axiosInstance.post(`/posts/comments`, {
+            postId: postInfo.get('id'),
+            parentId: parentId,
+            content: commentRef.current?.value
+          });
+
+          let commentList = commentInfo?.commentList;
+          commentList.push(response.data);
+          setCommentInfo({
+            ...commentInfo,
+            commentList: commentList
+          });
+
       } catch(exception){
         console.log(exception);
       }
