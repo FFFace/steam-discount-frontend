@@ -1,7 +1,7 @@
-import { useLocation } from "react-router-dom"
+import { useLocation, useSearchParams } from "react-router-dom"
 import Contents from "../../component/Contents"
 import { CustomBox } from "../../component/ui/box/CustomBox"
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Box, TextField } from "@mui/material";
 import CustomTypography from "../../component/ui/typography/CustomTypography";
 import { CustomTextField } from "../../component/ui/textField/CustomTextField";
@@ -11,15 +11,38 @@ import '@toast-ui/editor/dist/theme/toastui-editor-dark.css';
 import { isMobile } from "react-device-detect";
 import { CustomButton, CustomButtonWhite } from "../../component/ui/button/CustomButton";
 import { axiosInstance } from "../../utils/axios";
+import { TrySharp } from "@mui/icons-material";
+import Loading from "../../component/ui/loading/Loading";
+import { useRecoilState } from "recoil";
+import { userState } from "../../utils/atom";
 
 
 const WritePost = () => {
 
   const location = useLocation();
   const board = location.state?.board;
+  const postInfo = location.state?.postInfo;
+
+  const [recoilState, setRecoilState] = useRecoilState(userState);
 
   const editorRef = useRef();
   const postNameRef = useRef();
+
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const getPost = async () => {
+      try{
+        const response = await axiosInstance.get(`/posts/${postInfo?.id}`);
+        console.log(response);
+      } catch(exception){
+        console.log(exception);
+      }
+    }
+
+    if(postInfo?.updated)
+      getPost();
+  }, [])
 
   const PCEditor = () => {
     return(
@@ -31,6 +54,7 @@ const WritePost = () => {
          height='500px' 
          theme='dark'
          hideModeSwitch='true'
+         initialValue={postInfo?.content ? postInfo.content : null}
          ref={editorRef}
          toolbarItems={[
           ['heading', 'bold', 'italic', 'strike'],
@@ -61,8 +85,24 @@ const WritePost = () => {
   }
 
   const onClickWritePostButton = async () => {
+    setLoading(true);
     try{
-      await axiosInstance.post(`/posts`, {
+        await axiosInstance.post(`/posts`, {
+          boardId: board.id,
+          name: postNameRef.current?.value,
+          content: editorRef.current?.getInstance().getMarkdown()
+        });
+    } catch(exception){
+      console.log(exception);
+    }
+    setLoading(false);
+    window.open(`/post?board-name=${board?.name}&id=${postInfo?.id}&name=${postInfo?.name}&writer=${recoilState?.nickname}`, 'noopener,noreferrer');
+  }
+
+  const onClickUpdatePostButton = async () => {
+    setLoading(true);
+    try{
+      await axiosInstance.put(`/posts/${postInfo.id}`, {
         boardId: board.id,
         name: postNameRef.current?.value,
         content: editorRef.current?.getInstance().getMarkdown()
@@ -70,6 +110,8 @@ const WritePost = () => {
     } catch(exception){
       console.log(exception);
     }
+    setLoading(false);
+    window.open(`/post?board-name=${board?.name}&id=${postInfo?.id}&name=${postInfo?.name}&writer=${recoilState?.nickname}`, 'noopener,noreferrer');
   }
 
   return(
@@ -83,16 +125,17 @@ const WritePost = () => {
       </CustomBox>
 
       <CustomBox>
-        <CustomTextField name='name' placeholder="제목을 입력해 주세요." inputRef={postNameRef}/>
+        <CustomTextField name='name' placeholder="제목을 입력해 주세요." inputRef={postNameRef} defaultValue={postInfo?.name ? postInfo.name : null}/>
           
         {isMobile ? <MobileEditor/> : <PCEditor/>}
 
         <Box sx={{margin: '10px 0px'}}>
-          <CustomButtonWhite onClick={onClickWritePostButton}>
-            글쓰기
-          </CustomButtonWhite>
+          {postInfo?.id ? <CustomButtonWhite onClick={onClickUpdatePostButton}>글 수정</CustomButtonWhite> :
+            <CustomButtonWhite onClick={onClickWritePostButton}>글 쓰기</CustomButtonWhite>}
+          
         </Box>
       </CustomBox>
+      <Loading open={loading}/>
     </Contents>
   )
 }

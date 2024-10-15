@@ -49,8 +49,6 @@ const Header = () =>{
           role: response.data.role 
         })
 
-        console.log(response);
-
       } catch(exception){
 
         setRecoilState({

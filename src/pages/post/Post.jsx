@@ -2,8 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import Contents from "../../component/Contents"
 import { CustomBox } from "../../component/ui/box/CustomBox"
 import CustomTypography from "../../component/ui/typography/CustomTypography"
-import { useLocation, useSearchParams } from "react-router-dom"
-import { Box, Button, DialogActions, IconButton } from "@mui/material"
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom"
+import { Box, Button, DialogActions, IconButton, Menu, MenuItem } from "@mui/material"
 import { axiosInstance } from "../../utils/axios"
 import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
 import ThumbDownAlt from "@mui/icons-material/ThumbDownAlt"
@@ -46,6 +46,7 @@ const Post = () => {
   const [recoilState, setRecoilState] = useRecoilState(userState);
 
   const commentRef = useRef();
+  const navigate = useNavigate();
   
   const getCommentList = async (page) => {
     try{
@@ -89,8 +90,7 @@ const Post = () => {
       currentPage: 0
     });
 
-    if(!commentInfo)
-      getCommentList(0);
+    getCommentList(0);
   }, [])
 
   const ToastPostContentComponent = () => {
@@ -188,10 +188,40 @@ const Post = () => {
   }
 
   const MoreHorizComponent = () => {
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (e) => {
+      setAnchorEl(e.currentTarget);
+    };
+    const handleClose = () => {
+      setAnchorEl(null);
+    };
+
+    const onClickPostUpdate = () => {
+      navigate('/write-post', {
+        state: {
+          board: {
+            name: postInfo.get('board-name')
+          },
+          postInfo: {
+            id: postInfo.get('id'),
+            name: postInfo.get('name'),
+            content: postDetailInfo.content
+          }
+        }
+      })
+    }
+
     return (
-      <IconButton>
-        <MoreHorizIcon fontSize="large" sx={{color: 'var(--color4)'}}/>
-      </IconButton>
+      <>
+        <IconButton id='menu-button' aria-controls={open ? 'menu-button' : undefined} aria-haspopup="true" aria-expanded={open ? 'true' : undefined} onClick={handleClick}>
+          <MoreHorizIcon fontSize="large" sx={{color: 'var(--color4)'}}/>
+        </IconButton>
+        <Menu open={open} anchorEl={anchorEl} onClose={handleClose} MenuListProps={{'aria-labelledby': 'menu-button'}} sx={{"& .MuiMenu-paper": {backgroundColor: 'var(--color1)'}}}>
+          <MenuItem sx={{color: 'var(--color4)'}} onClick={onClickPostUpdate}>수정</MenuItem>
+          <MenuItem sx={{color: 'var(--color4)'}}>삭제</MenuItem>
+        </Menu>
+      </>
     )
   }
 
@@ -425,7 +455,7 @@ const Post = () => {
           {postInfo.get('name')}
         </CustomTypography>
         <Box sx={{float: 'right'}}>
-          {isMobile && postInfo.get('writer') ? <MoreHorizComponent/> : null}
+          {!isMobile && postInfo.get('writer') === recoilState.nickname ? <MoreHorizComponent/> : null}
         </Box>
         <Box>
           <CustomTypography sx={{display: 'inline-block', padding: '0px 0px 10px 10px'}}>
