@@ -3,7 +3,7 @@ import Contents from "../../component/Contents"
 import { CustomBox } from "../../component/ui/box/CustomBox"
 import CustomTypography from "../../component/ui/typography/CustomTypography"
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom"
-import { Box, Button, DialogActions, IconButton, Menu, MenuItem } from "@mui/material"
+import { Box, Button, DialogActions, IconButton, Menu, MenuItem, TextField } from "@mui/material"
 import { axiosInstance } from "../../utils/axios"
 import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
 import ThumbDownAlt from "@mui/icons-material/ThumbDownAlt"
@@ -17,6 +17,7 @@ import '@toast-ui/editor/dist/theme/toastui-editor-dark.css';
 import { CustomTextField, CustomTextFieldComment, CustomTextFieldComment1, CustomTextFieldComment2, CustomTextFieldComment3 } from "../../component/ui/textField/CustomTextField"
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { isMobile } from "react-device-detect"
+import { BorderColor, Close, Delete, Save } from "@mui/icons-material"
 
 const pcState = {
   nicknameWidth: '20%',
@@ -240,34 +241,133 @@ const Post = () => {
     );
   }
 
-  const CommentListComponent = () => {
-    return commentInfo.commentList.map(comment => (
-      <Box key={comment.id} sx={{margin: '0px 0px 8px 0px', padding: '0px 0px 8px 0px', borderBottomStyle: 'solid', borderWidth: '2px', borderColor: 'var(--color1)'}}>
-        <Box sx={{display: 'flex'}}>
-          <CustomTypography sx={{width: deviceState.nicknameWidth, display: 'inline-block', alignContent: 'center'}}>
-            {comment.writer}
-          </CustomTypography>
+  const CustomTextFieldCommentUpdateDepth0 = ({...props}) => {
+    return (
+      <TextField size="small" multiline sx={{
+        width: deviceState.contentWidth,
+        margin: '5px 0px 10px 0px',
+        display: 'flex',
+        ' .MuiOutlinedInput-root': {
+          color: 'white',
+          border: 'solid 1px var(--color1)',
+          backgroundColor: 'var(--color1)',
+          '&.Mui-focused fieldset': {
+            border: 'solid 2px gray'
+          }
+        }
+      }} 
+      {...props} />
+    );
+  };
 
-          <CustomTypography sx={{width: deviceState.contentWidth, display: 'inline-block', whiteSpace: 'pre-line'}}>
-            {comment.content}
-          </CustomTypography>
+  const CustomTextFieldCommentUpdateDepth1 = ({...props}) => {
+    return (
+      <TextField size="small" multiline sx={{
+        width: deviceState.contentWidth,
+        margin: '5px 0px 10px 0px',
+        display: 'flex',
+        ' .MuiOutlinedInput-root': {
+          color: 'white',
+          border: 'solid 1px var(--color2)',
+          backgroundColor: 'var(--color2)',
+          '&.Mui-focused fieldset': {
+            border: 'solid 2px gray'
+          }
+        }
+      }} 
+      {...props} />
+    );
+  };
 
-          {isMobile ? null : 
-            <CustomTypography sx={{width: deviceState.dateWidth, display: 'inline-block', textAlign: 'right', alignContent: 'center'}}>
-              {comment.createdAt}
-            </CustomTypography>}
+  const CommentComponent = ({comment, parentId, depth}) => {
 
-        </Box>
+    const [updated, setUpdated] = useState(false);
 
-        <Box sx={{margin: '8px 0px -5px 0px'}}>
-          <ReplyCommentComponent comment={comment} parentId={comment.id} depth={1}/>
-        </Box>
-      </Box>
+    const onClickUpdateIconButton = (e) => {
+      e.preventDefault();
+      setUpdated(!updated);
+    }
 
-    ))
+    const UpdateDeleteIcon = () => {
+      return (
+        <>
+          {updated ? 
+            <IconButton sx={{float: 'left'}}>
+              <Save fontSize="small" sx={{color: 'var(--color4)'}}/>
+            </IconButton> 
+            :
+            <IconButton onClick={onClickUpdateIconButton} sx={{float: 'left'}}>
+              <BorderColor fontSize="small" sx={{color: 'var(--color4)'}}/>
+            </IconButton>}
+          
+          {updated ? 
+            <IconButton onClick={onClickUpdateIconButton} sx={{float: 'left'}}>
+              <Close fontSize="small" sx={{color: 'var(--color4)'}}/>
+            </IconButton>
+            :
+            <IconButton sx={{float: 'left'}}>
+              <Delete fontSize="small" sx={{color: 'var(--color4)'}}/>
+            </IconButton>}          
+        </>
+      )
+    }
+
+    const BoxingContent = () => {
+      return (
+        <>
+          <Box sx={{display: 'flex'}}>
+            <CustomTypography sx={{width: deviceState.nicknameWidth, display: 'inline-block', alignContent: 'center'}}>
+              {comment.writer}
+            </CustomTypography>
+
+            {updated && depth === 1 ? <CustomTextFieldCommentUpdateDepth0 defaultValue={comment.content}/> :
+              updated && depth === 2 ? <CustomTextFieldCommentUpdateDepth1 defaultValue={comment.content}/> :
+              <CustomTypography sx={{width: deviceState.contentWidth, display: 'inline-block', whiteSpace: 'pre-line'}}>
+                {comment.content}
+              </CustomTypography>}
+
+            {isMobile ? null : 
+              <CustomTypography sx={{width: deviceState.dateWidth, display: 'inline-block', textAlign: 'right', alignContent: 'center'}}>
+                {comment.createdAt}
+              </CustomTypography>}
+          </Box>
+
+          <Box sx={{margin: '8px 0px -5px 0px'}}>
+            <UpdateDeleteIcon/>
+            <CommentBottomComponent comment={comment} parentId={parentId ? parentId : comment.id} depth={depth}/>
+          </Box>
+        </>
+      )
+    }
+
+    return (
+      <>
+        {depth === 1 ? 
+          <Box key={comment.id} sx={{margin: '0px 0px 8px 0px', padding: '0px 0px 8px 0px', borderBottomStyle: 'solid', borderWidth: '2px', borderColor: 'var(--color1)'}}>
+            <BoxingContent/>
+          </Box>
+          :
+          <Box key={comment.id} sx={{margin: '8px 0px 0px 0px', padding: '8px 8px 8px 50px', borderTopStyle: 'solid', borderWidth: '2px', borderColor: 'var(--color1)', backgroundColor: 'var(--color1)'}}>
+            <BoxingContent/>  
+          </Box>}
+      </>
+    )
   }
 
-  const ReplyCommentComponent = ({comment, parentId, depth}) => {
+  const CommentListComponent = ({commentList, parentId, depth}) => {
+
+    if(!commentList){
+      return commentInfo.commentList.map(comment => (
+        <CommentComponent key={comment.id} comment={comment} depth={depth}/>
+      ))
+    } else{
+      return commentList.map(comment => (
+        <CommentComponent key={comment.id} comment={comment} parentId={parentId} depth={depth}/>
+      ));
+    }
+  }
+
+  const CommentBottomComponent = ({comment, parentId, depth}) => {
     const [display, setDisplay] = useState(false);
     const [reply, setReply] = useState(null);
     const [replyDisplay, setReplyDisplay] = useState(false);
@@ -277,7 +377,6 @@ const Post = () => {
     };
 
     const onClickMoreReplyButton = async () => {
-
       try{
         const response = await axiosInstance.get('/posts/comments/reply', {
           params: {
@@ -306,14 +405,13 @@ const Post = () => {
         totalPage: comment?.replyCommentPageResponseDTO?.totalPage
       });
     }, []);
-    
+
     return (
       <> 
         {display ? <CommentTextFieldComponent parentId={parentId} depth={depth} defaultValue={`@${comment.writer} `} /> : null}
         
         <Box sx={{textAlign: 'right'}}>
           <Box sx={{display: 'inline-block'}}>
-
             {reply?.replyList?.length > 0 && !replyDisplay ?
             <CustomButton onClick={()=>setReplyDisplay(!replyDisplay)}>
               답글 펼치기
@@ -321,13 +419,13 @@ const Post = () => {
             <CustomButton onClick={() => setReplyDisplay(!replyDisplay)}>
               답글 접기
             </CustomButton> : null}
-
+            
             {display ? <CustomButton onClick={(e) => onClickCommendButton(e)}>취소</CustomButton> :
-              <CustomButton onClick={(e) => onClickCommendButton(e)}>답글</CustomButton>}
+              <CustomButton onClick={(e) => onClickCommendButton(e)}>답글</CustomButton>}            
 
           </Box>
         </Box>        
-        {replyDisplay ? <MoreReplyComponent replyList={reply?.replyList} parentId={comment.id}/> : null}
+        {replyDisplay ? <CommentListComponent commentList={reply?.replyList} parentId={comment.id} depth={2} /> : null}
         {replyDisplay &&  reply?.currentPage+1 < reply?.totalPage ? 
         <Box sx={{margin: '10px 0px 10px 0px', display: 'flex', textAlign: 'center', justifyContent: 'center'}}>
           <CustomButton onClick={onClickMoreReplyButton}>
@@ -337,41 +435,6 @@ const Post = () => {
       </>
 
     )
-  }
-
-  const MoreReplyComponent = ({replyList, parentId}) => {
-      return replyList.map(reply => (
-      <Box key={reply.id} sx={{margin: '8px 0px 0px 0px', padding: '8px 8px 8px 50px', borderTopStyle: 'solid', borderWidth: '2px', borderColor: 'var(--color1)', backgroundColor: 'var(--color1)'}}>
-        <Box sx={{display: 'flex'}}>
-          <CustomTypography sx={{width: deviceState.nicknameWidth, display: 'inline-block', alignContent: 'center'}}>
-            {reply.writer}
-          </CustomTypography>
-
-          <CustomTypography sx={{width: deviceState.contentWidth, display: 'inline-block', whiteSpace: 'pre-line'}}>
-            {reply.content}
-          </CustomTypography>
-
-          {isMobile ? null : 
-            <CustomTypography sx={{width: deviceState.dateWidth, display: 'inline-block', textAlign: 'right', alignContent: 'center'}}>
-              {reply.createdAt}
-            </CustomTypography>}
-
-        </Box>
-
-        <Box sx={{margin: '8px 0px -5px 0px'}}>
-          <IconButton sx={{margin: '0px 0px 0px 19%'}}>
-            <ThumbUpAltIcon sx={{color: 'var(--color4)'}}/>
-          </IconButton>
-          <CustomTypography sx={{display: 'inline-block'}}>{reply.thumbsUp}</CustomTypography>
-
-          <IconButton sx={{margin: '0px 0px 0px 15px'}}>
-            <ThumbDownAlt sx={{color: 'var(--color4)'}}/>
-          </IconButton>
-          <CustomTypography sx={{display: 'inline-block'}}>{reply.thumbsDown}</CustomTypography>
-          <ReplyCommentComponent comment={reply} parentId={parentId} depth={2}/>
-        </Box>
-      </Box>
-      ));
   }
 
   const CommentTextFieldComponent = ({parentId, depth, defaultValue}) => {
@@ -485,7 +548,7 @@ const Post = () => {
 
         <Box sx={{margin: '10px 0px', padding: '10px 0px', borderTopStyle: 'solid', borderBottomStyle: 'solid', borderWidth: '3px', borderColor: 'var(--color1)'}}>
           <Box sx={{padding: '0px 10px 0px 10px'}}>
-            {commentInfo?.commentList ? <CommentListComponent/> : null}
+            {commentInfo?.commentList ? <CommentListComponent depth={1}/> : null}
           </Box>
           {commentInfo?.totalPage > commentInfo?.currentPage+1 ? <MoreCommentComponent/> : null}
         </Box>
