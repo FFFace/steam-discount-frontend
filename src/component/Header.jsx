@@ -40,18 +40,24 @@ const Header = () =>{
   useEffect(() =>{
     const pageOpen = async () => {
       try{
-        await axiosInstance.get(`/token-check`);
+        const response = await axiosInstance.get(`/token-check`);
 
         setRecoilState({
           ...recoilState,
-          isLoggedIn: true
+          isLoggedIn: true,
+          nickname: response.data.nickname,
+          role: response.data.role 
         })
+
+        console.log(response);
 
       } catch(exception){
 
         setRecoilState({
           ...recoilState,
-          isLoggedIn: false
+          isLoggedIn: false,
+          nickname: null,
+          role: null
         })
 
         removeAccessToken();
