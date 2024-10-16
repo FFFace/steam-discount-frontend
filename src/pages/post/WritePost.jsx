@@ -54,7 +54,7 @@ const WritePost = () => {
          height='500px' 
          theme='dark'
          hideModeSwitch='true'
-         initialValue={postInfo?.content ? postInfo.content : null}
+         initialValue={postInfo?.content ? postInfo.content : ""}
          ref={editorRef}
          toolbarItems={[
           ['heading', 'bold', 'italic', 'strike'],
@@ -87,16 +87,17 @@ const WritePost = () => {
   const onClickWritePostButton = async () => {
     setLoading(true);
     try{
-        await axiosInstance.post(`/posts`, {
+        const response = await axiosInstance.post(`/posts`, {
           boardId: board.id,
-          name: postNameRef.current?.value,
-          content: editorRef.current?.getInstance().getMarkdown()
+          name: postNameRef.current.value,
+          content: editorRef.current.getInstance().getMarkdown()
         });
+
+        window.open(`/post?board-name=${board.name}&id=${response.data}&name=${postNameRef.current.value}&writer=${recoilState.nickname}`, 'noopener,noreferrer');
     } catch(exception){
       console.log(exception);
     }
     setLoading(false);
-    window.open(`/post?board-name=${board?.name}&id=${postInfo?.id}&name=${postInfo?.name}&writer=${recoilState?.nickname}`, 'noopener,noreferrer');
   }
 
   const onClickUpdatePostButton = async () => {
@@ -107,11 +108,13 @@ const WritePost = () => {
         name: postNameRef.current?.value,
         content: editorRef.current?.getInstance().getMarkdown()
       });
+
+      window.open(`/post?board-name=${board.name}&id=${postInfo.id}&name=${postInfo.name}&writer=${recoilState.nickname}`, 'noopener,noreferrer');
     } catch(exception){
       console.log(exception);
     }
     setLoading(false);
-    window.open(`/post?board-name=${board?.name}&id=${postInfo?.id}&name=${postInfo?.name}&writer=${recoilState?.nickname}`, 'noopener,noreferrer');
+    
   }
 
   return(
