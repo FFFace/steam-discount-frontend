@@ -9,16 +9,15 @@ import Loading from "../../component/ui/loading/Loading";
 import { CustomButton } from "../../component/ui/button/CustomButton";
 import { useRecoilState } from "recoil";
 import { userState } from "../../utils/atom";
-import { ErrorNeedLogin } from "../../component/ui/dialog/CustomDialog";
+import { CustomDialogError } from "../../component/ui/dialog/CustomDialog";
 
 
 const NOTICE_BOARD_NUMBER = 1;
 
 const Board = () => {
 
-  const [page, setPage] = useState(0);
   const [totalPage, setTotalPage] = useState(0);
-  const [postList, setPostList] = useState(null);
+  const [postInfo, setPostInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [openLoginError, setOpenLoginError] = useState(false);
 
@@ -28,28 +27,35 @@ const Board = () => {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
+  const getPostList = async (page) => {
     setLoading(true);
-    setPostList(null);
-    const getNoticeList = async () => {
-      try{
-        const response = await axiosInstance.get(`/posts`, {
-          params:{
-            boardId: board.id,
-            page: page
-          }
-        });
-        
-        setTotalPage(response.data.totalPage);
-        setPostList(response.data.postPageResponseDTOList)
-      } catch(exception){
-        console.log(exception);
-      }
+    try{
+      const response = await axiosInstance.get(`/posts`, {
+        params:{
+          boardId: board.id,
+          page: page
+        }
+      });
+      
+      let postList = postInfo?.postList;
+      !postList || page === 0 ? postList = response.data.postPageResponseDTOList : postList.push(...response.data.postPageResponseDTOList);
 
-      setLoading(false);
+      setPostInfo({
+        postList: postList,
+        totalPage: response.data.totalPage,
+        currentPage: page
+      });
+
+    } catch(exception){
+      console.log(exception);
     }
+    setLoading(false);
+  }
 
-    getNoticeList();
+  useEffect(() => {
+    setPostInfo(null);
+
+    getPostList(0);
   }, [board]);
 
   const PostListTypographyTitle = ({children}) => {
@@ -81,8 +87,8 @@ const Board = () => {
     window.open(`/post?board-name=${board?.name}&id=${post.id}&name=${post.name}&writer=${post.writer}`, '_blank', 'noopener,noreferrer');
   }
 
-  const PostListComponent = () =>{
-    return postList.map(post => (
+  const PostList = () =>{
+    return postInfo.postList.map(post => (
         <Box key={post.id} sx={{borderBottomStyle: 'solid', borderWidth: '3px', borderColor: 'var(--color1)'}}>
           {/* <Link onClick={(e)=>onClickNoticePost(e, post)}>
             <PostListTypographyTitle>{post.name}</PostListTypographyTitle>
@@ -91,7 +97,6 @@ const Board = () => {
           <Link onClick={(e) => onClickPost(e, post)}>
             <PostListTypographyTitle>{post.name}</PostListTypographyTitle>
           </Link>
-
 
           <PostListTypographyWriter>{post.writer}</PostListTypographyWriter>
 
@@ -117,10 +122,21 @@ const Board = () => {
     })
   }
 
-  const onClickNoticePost = (e, post) => {
-    e.preventDefault();
+  const MorePostList = () => {
 
-    navigate('/post', {state: {post: post}});
+    const onClickMorePost = (e) => {
+      e.preventDefault();
+
+      getPostList(postInfo.currentPage+1);
+    }
+
+    return(
+      <Box sx={{margin: '20px 0px 0px 0px', display: 'flex', textAlign: 'center', justifyContent: 'center', border: 'double 6px var(--color1)'}}>
+        <CustomButton fullWidth onClick={onClickMorePost}>
+          댓글 더 보기
+        </CustomButton>
+      </Box>
+    )
   }
 
   return(
@@ -142,11 +158,12 @@ const Board = () => {
       </CustomBox>
         
       <CustomBox>
-        {postList ? <PostListComponent/> : null}
+        {postInfo?.totalPage ? <PostList/> : <CustomTypography variant='h5' sx={{padding: '10px'}}>게시글이 존재하지 않습니다.</CustomTypography>}
+        {postInfo?.totalPage > postInfo?.currentPage + 1 ? <MorePostList/> : null}
       </CustomBox>
 
       <Loading open={loading}/>
-      <ErrorNeedLogin open={openLoginError} dialogAction={() => setOpenLoginError(false)}/>
+      <CustomDialogError open={openLoginError} dialogAction={() => setOpenLoginError(false)} title={'권한 없음'} content={'로그인이 필요한 작업입니다.\n로그인 후 다시 이용해 주세요'}/>
     </Contents>
   )
 }

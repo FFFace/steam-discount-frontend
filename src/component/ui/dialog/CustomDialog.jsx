@@ -24,19 +24,18 @@ export const CustomDialogErrorTitle = (props) => {
 
 export const CustomDialogContent = (props) => {
   return(
-    <DialogContent sx={{color: 'var(--color4)'}} {...props}>{props.children}</DialogContent>
+    <DialogContent sx={{color: 'var(--color4)', whiteSpace: 'pre-line'}} {...props}>{props.children}</DialogContent>
   );
 }
 
-export const ErrorNeedLogin = ({open, dialogAction}) => {
+export const CustomDialogError = ({open, dialogAction, title, content}) => {
   return(
     <CustomDialog open={open}>
       <CustomDialogErrorTitle>
-        권한 없음
+        {title}
       </CustomDialogErrorTitle>
       <CustomDialogContent>
-        현재 로그인 상태가 아닙니다.<br/>
-        로그인 후 다시 이용해 주세요.
+        {content}
       </CustomDialogContent>
       <DialogActions>
         <CustomButton onClick={dialogAction}>

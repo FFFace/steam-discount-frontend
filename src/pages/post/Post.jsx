@@ -10,7 +10,7 @@ import ThumbDownAlt from "@mui/icons-material/ThumbDownAlt"
 import Loading from "../../component/ui/loading/Loading"
 import { useRecoilState } from "recoil"
 import { userState } from "../../utils/atom"
-import { CustomDialog, CustomDialogContent, CustomDialogErrorTitle, CustomDialogTitle } from "../../component/ui/dialog/CustomDialog"
+import { CustomDialog, CustomDialogContent, CustomDialogErrorTitle, CustomDialogTitle, CustomDialogError } from "../../component/ui/dialog/CustomDialog"
 import { CustomButton, CustomButtonWhite } from "../../component/ui/button/CustomButton"
 import { Viewer } from "@toast-ui/react-editor"
 import '@toast-ui/editor/dist/theme/toastui-editor-dark.css';
@@ -40,7 +40,11 @@ const Post = () => {
 
   const [postDetailInfo, setPostDetailInfo] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [dialog, setDialog] = useState(false);
+  const [errorInfo, setErrorInfo] = useState({
+    open: false,
+    title: null,
+    content: null
+  });
   
   const [commentInfo, setCommentInfo] = useState(null);
 
@@ -50,6 +54,7 @@ const Post = () => {
   const navigate = useNavigate();
   
   const getCommentList = async (page) => {
+    setLoading(true);
     try{
       const response = await axiosInstance.get(`/posts/comments`, {
         params: {
@@ -64,12 +69,15 @@ const Post = () => {
       setCommentInfo({
         commentList: commentList,
         currentPage: page,
-        totalPage: response.data.totalPage
+        totalPage: response.data.totalPage,
+        totalElement: response.data.totalElement
       })
 
     } catch(exception){
       console.log(exception);
     }
+
+    setLoading(false);
   }
 
   useEffect(()=>{
@@ -82,7 +90,6 @@ const Post = () => {
       } catch(exception){
 
       }
-      setLoading(false);
     }
 
     getPost();
@@ -94,7 +101,7 @@ const Post = () => {
     getCommentList(0);
   }, [])
 
-  const ToastPostContentComponent = () => {
+  const ToastPostContent = () => {
     return(
       <Box sx={{padding: '10px'}}>
         <Viewer initialValue={postDetailInfo.content} theme='dark'/>
@@ -102,7 +109,7 @@ const Post = () => {
     )
   }
 
-  const PostThumbsComponent = () => {
+  const PostThumbs = () => {
     return(
       <Box sx={{margin: '50px 0px 0px 0px',padding: '10px', textAlign: 'center'}}>
         <IconButton sx={{margin: '0px 5px 0px 0px'}} onClick={onClickThumbsUpButton}>
@@ -139,7 +146,13 @@ const Post = () => {
   }
 
   const isLoggedInForThumbsButton = () => {
-    setDialog(!recoilState.isLoggedIn);
+    setErrorInfo({
+      ...errorInfo,
+      open: !recoilState.isLoggedIn,
+      title: '권한 없음',
+      content: '로그인이 필요한 기능입니다.\n로그인 후 다시 이용해 주세요.'
+    });
+
     return !recoilState.isLoggedIn;
   }
 
@@ -165,30 +178,7 @@ const Post = () => {
     setLoading(false);
   }
 
-  const DialogError = () => {
-    return(
-      <CustomDialog open={dialog}>
-        <CustomDialogErrorTitle>
-          사용할 수 없습니다.
-        </CustomDialogErrorTitle>
-        <CustomDialogContent>
-          로그인 한 사용자만 이용할 수 있습니다.<br/>
-          로그인 후 다시 이용해 주세요.
-        </CustomDialogContent>
-        <DialogActions>
-          <CustomButton onClick={onClickDialogErrorAccept}>
-            확인
-          </CustomButton>
-        </DialogActions>
-      </CustomDialog>
-    )
-  }
-
-  const onClickDialogErrorAccept = () => {
-    setDialog(false);
-  }
-
-  const MoreHorizComponent = () => {
+  const MoreHoriz = () => {
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
     const handleClick = (e) => {
@@ -233,7 +223,7 @@ const Post = () => {
     getCommentList(page);
   }
 
-  const MoreCommentComponent = () => {
+  const MoreComment = () => {
     return (
       <Box sx={{margin: '20px 0px 0px 0px', display: 'flex', textAlign: 'center', justifyContent: 'center', border: 'double 6px var(--color1)'}}>
         <CustomButton fullWidth onClick={onClickMoreComment}>댓글 더 보기</CustomButton>
@@ -279,7 +269,7 @@ const Post = () => {
     );
   };
 
-  const CommentComponent = ({comment, parentId, depth}) => {
+  const Comment = ({comment, parentId, depth}) => {
 
     const [updated, setUpdated] = useState(false);
 
@@ -333,8 +323,8 @@ const Post = () => {
           </Box>
 
           <Box sx={{margin: '8px 0px -5px 0px'}}>
-            <UpdateDeleteIcon/>
-            <CommentBottomComponent comment={comment} parentId={parentId ? parentId : comment.id} depth={depth}/>
+            {recoilState.nickname === comment.writer ? <UpdateDeleteIcon/> : null}
+            <CommentBottom comment={comment} parentId={parentId ? parentId : comment.id} depth={depth}/>
           </Box>
         </>
       )
@@ -354,20 +344,20 @@ const Post = () => {
     )
   }
 
-  const CommentListComponent = ({commentList, parentId, depth}) => {
+  const CommentList = ({commentList, parentId, depth}) => {
 
     if(!commentList){
       return commentInfo.commentList.map(comment => (
-        <CommentComponent key={comment.id} comment={comment} depth={depth}/>
+        <Comment key={comment.id} comment={comment} depth={depth}/>
       ))
     } else{
       return commentList.map(comment => (
-        <CommentComponent key={comment.id} comment={comment} parentId={parentId} depth={depth}/>
+        <Comment key={comment.id} comment={comment} parentId={parentId} depth={depth}/>
       ));
     }
   }
 
-  const CommentBottomComponent = ({comment, parentId, depth}) => {
+  const CommentBottom = ({comment, parentId, depth}) => {
     const [display, setDisplay] = useState(false);
     const [reply, setReply] = useState(null);
     const [replyDisplay, setReplyDisplay] = useState(false);
@@ -408,7 +398,7 @@ const Post = () => {
 
     return (
       <> 
-        {display ? <CommentTextFieldComponent parentId={parentId} depth={depth} defaultValue={`@${comment.writer} `} /> : null}
+        {display ? <CommentTextField parentId={parentId} depth={depth} defaultValue={`@${comment.writer} `} /> : null}
         
         <Box sx={{textAlign: 'right'}}>
           <Box sx={{display: 'inline-block'}}>
@@ -425,7 +415,7 @@ const Post = () => {
 
           </Box>
         </Box>        
-        {replyDisplay ? <CommentListComponent commentList={reply?.replyList} parentId={comment.id} depth={2} /> : null}
+        {replyDisplay ? <CommentList commentList={reply?.replyList} parentId={comment.id} depth={2} /> : null}
         {replyDisplay &&  reply?.currentPage+1 < reply?.totalPage ? 
         <Box sx={{margin: '10px 0px 10px 0px', display: 'flex', textAlign: 'center', justifyContent: 'center'}}>
           <CustomButton onClick={onClickMoreReplyButton}>
@@ -437,9 +427,18 @@ const Post = () => {
     )
   }
 
-  const CommentTextFieldComponent = ({parentId, depth, defaultValue}) => {
-
+  const CommentTextField = ({parentId, depth, defaultValue}) => {
     const onClickCreateComment = async () => {
+
+      if(commentRef.current?.value.length <= 0){
+        setErrorInfo({
+          open: true,
+          title: '요청 실패',
+          content: '공백은 댓글로 등록할 수 없습니다.\n댓글 내용을 확인해 주세요'
+        })
+        return;
+      }
+
       setLoading(true);
       try{
           const response = await axiosInstance.post(`/posts/comments`, {
@@ -497,7 +496,10 @@ const Post = () => {
 
         <Box sx={{margin: '-10px 0px 0px', display: 'flex', textAlign: 'center', justifyContent: 'right'}}>
           <Box>
-            <CustomButton onClick={onClickCreateComment}>댓글 등록</CustomButton>
+            {!recoilState.isLoggedIn ? 
+              <CustomButton disabled>댓글 등록</CustomButton> :
+              <CustomButton onClick={onClickCreateComment}>댓글 등록</CustomButton>}
+            
           </Box>
         </Box>
     </Box>
@@ -518,7 +520,7 @@ const Post = () => {
           {postInfo.get('name')}
         </CustomTypography>
         <Box sx={{float: 'right'}}>
-          {!isMobile && postInfo.get('writer') === recoilState.nickname ? <MoreHorizComponent/> : null}
+          {!isMobile && postInfo.get('writer') === recoilState.nickname ? <MoreHoriz/> : null}
         </Box>
         <Box>
           <CustomTypography sx={{display: 'inline-block', padding: '0px 0px 10px 10px'}}>
@@ -531,8 +533,8 @@ const Post = () => {
       </CustomBox>
 
       <CustomBox>
-        {postDetailInfo ? <ToastPostContentComponent/> : null}
-        {postDetailInfo ? <PostThumbsComponent/> : null}
+        {postDetailInfo ? <ToastPostContent/> : null}
+        {postDetailInfo ? <PostThumbs/> : null}
         
       </CustomBox>
 
@@ -542,20 +544,24 @@ const Post = () => {
             전체 댓글
           </CustomTypography>
           <CustomTypography sx={{margin: '0px 0px 0px 5px', display: 'inline-block'}}>
-            (99개)
+            ({commentInfo ? commentInfo?.totalElement : null })
           </CustomTypography>          
         </Box>
 
         <Box sx={{margin: '10px 0px', padding: '10px 0px', borderTopStyle: 'solid', borderBottomStyle: 'solid', borderWidth: '3px', borderColor: 'var(--color1)'}}>
           <Box sx={{padding: '0px 10px 0px 10px'}}>
-            {commentInfo?.commentList ? <CommentListComponent depth={1}/> : null}
+            {commentInfo?.commentList ? <CommentList depth={1}/> : null}
           </Box>
-          {commentInfo?.totalPage > commentInfo?.currentPage+1 ? <MoreCommentComponent/> : null}
+          {commentInfo?.totalPage > commentInfo?.currentPage+1 ? <MoreComment/> : null}
         </Box>
         
-        <CommentTextFieldComponent depth={0}/>
+        <CommentTextField depth={0}/>
       </CustomBox>
-      <DialogError/>
+      <CustomDialogError open={errorInfo.open} title={errorInfo.title} content={errorInfo.content} dialogAction={() => 
+        setErrorInfo({
+          ...errorInfo,
+          open: false
+        })}/>
       <Loading open={loading}/>
     </Contents>
   )

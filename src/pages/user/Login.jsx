@@ -10,7 +10,7 @@ import { axiosInstance } from "../../utils/axios";
 import { setLoginState, saveAccessToken } from "../../utils/storage";
 import { CustomDialog, CustomDialogContent, CustomDialogTitle } from "../../component/ui/dialog/CustomDialog";
 import Loading from "../../component/ui/loading/Loading";
-import ErrorComponent, { LoginFailed, NeedDuplicateEmail } from "../../component/ui/error/error";
+import { LoginFailed, NeedDuplicateEmail } from "../../component/ui/error/error";
 import { useRecoilState } from "recoil";
 import { userState } from "../../utils/atom";
 
@@ -42,7 +42,7 @@ const Login = () => {
     navigate('/user-register');
   }
 
-  const ButtonComponent = ({...props}) => {
+  const LogInOutButton = ({...props}) => {
     return(
       <CustomButton fullWidth sx={{margin: '10px 0px auto', color: 'var(--color1)', fontWeight: 'bold', backgroundColor: 'var(--color3)', ":hover": {boa: 'var(--color1)'}}} {...props}>
         {props.children}
@@ -142,12 +142,12 @@ const Login = () => {
         <CustomTextField type='password' name='password' onChange={onChangeInfo} value={info.password}/>
 
         <Box sx={{margin: '25px 0px auto'}}>
-          <ButtonComponent onClick={onClickLoginButton}>
+          <LogInOutButton onClick={onClickLoginButton}>
             로그인
-          </ButtonComponent>
-          <ButtonComponent onClick={onClickRegister}>
+          </LogInOutButton>
+          <LogInOutButton onClick={onClickRegister}>
             회원가입
-          </ButtonComponent>
+          </LogInOutButton>
         </Box>
       </CustomBox>
       <LoginSuccess/>
