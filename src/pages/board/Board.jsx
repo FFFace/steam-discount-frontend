@@ -7,6 +7,9 @@ import { axiosInstance } from "../../utils/axios";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import Loading from "../../component/ui/loading/Loading";
 import { CustomButton } from "../../component/ui/button/CustomButton";
+import { useRecoilState } from "recoil";
+import { userState } from "../../utils/atom";
+import { ErrorNeedLogin } from "../../component/ui/dialog/CustomDialog";
 
 
 const NOTICE_BOARD_NUMBER = 1;
@@ -17,9 +20,11 @@ const Board = () => {
   const [totalPage, setTotalPage] = useState(0);
   const [postList, setPostList] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [openLoginError, setOpenLoginError] = useState(false);
 
   const location = useLocation();
   const board = location.state?.board;
+  const [recoilState, setRecoilState] = useRecoilState(userState);
 
   const navigate = useNavigate();
 
@@ -96,6 +101,12 @@ const Board = () => {
   }
 
   const onClickWritePostButton = () => {
+
+    if(!recoilState.isLoggedIn){
+      setOpenLoginError(true);
+      return;
+    }
+
     navigate('/write-post', {
       state: {
         board: {
@@ -135,6 +146,7 @@ const Board = () => {
       </CustomBox>
 
       <Loading open={loading}/>
+      <ErrorNeedLogin open={openLoginError} dialogAction={() => setOpenLoginError(false)}/>
     </Contents>
   )
 }
