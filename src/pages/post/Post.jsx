@@ -323,7 +323,7 @@ const Post = () => {
           </Box>
 
           <Box sx={{margin: '8px 0px -5px 0px'}}>
-            {recoilState.nickname === comment.writer ? <UpdateDeleteIcon/> : null}
+            {(recoilState.nickname === comment.writer) || (!isMobile && recoilState.role==='ADMIN') ? <UpdateDeleteIcon/> : null}
             <CommentBottom comment={comment} parentId={parentId ? parentId : comment.id} depth={depth}/>
           </Box>
         </>
@@ -520,7 +520,7 @@ const Post = () => {
           {postInfo.get('name')}
         </CustomTypography>
         <Box sx={{float: 'right'}}>
-          {!isMobile && postInfo.get('writer') === recoilState.nickname ? <MoreHoriz/> : null}
+          {(!isMobile && postInfo.get('writer') === recoilState.nickname) || (!isMobile && recoilState.role==='ADMIN') ? <MoreHoriz/> : null}
         </Box>
         <Box>
           <CustomTypography sx={{display: 'inline-block', padding: '0px 0px 10px 10px'}}>
