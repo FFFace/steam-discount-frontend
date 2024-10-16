@@ -1,4 +1,4 @@
-import { Typography, Box, Container, Button } from '@mui/material';
+import { Typography, Box, Container, Button, Menu, MenuItem } from '@mui/material';
 import {CustomButton} from './ui/button/CustomButton';
 import { Link, useNavigate } from 'react-router-dom';
 import { setLoginState, loginState, saveAccessToken, saveLogged, removeAccessToken, removeRefreshToken } from '../utils/storage';
@@ -148,7 +148,7 @@ const Header = () =>{
     setOpenBoardList(false);
   }
 
-  const BoardListComponent = () => { 
+  const BoardList = () => { 
     return boardList.boardList.map(board =>(
       <Box key={board.id} sx={{padding: '5px', borderBottomStyle: 'solid', borderWidth: '1px'}}>
         <Link onClick={(e) => onClickBoardButton(e, board.id, board.name)}>
@@ -164,20 +164,46 @@ const Header = () =>{
     setOpenBoardList(false);
   }
 
-  const BoardDialogComponent = () => {
+  const BoardDialog = () => {
     return(
       <CustomDialog open={openBoardList} onClose={onCloseBoardDialog}>
         <CustomDialogTitle>게시판 목록</CustomDialogTitle>
         <CustomDialogContent>
-          {boardList.boardList ? <BoardListComponent/> : null}
+          {boardList.boardList ? <BoardList/> : null}
         </CustomDialogContent>
       </CustomDialog>
     )
   }
 
+  const UserMenu = () => {
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (e) => {
+      setAnchorEl(e.currentTarget);
+    };
+    const handleClose = () => {
+      setAnchorEl(null);
+    };
+
+    return(
+      <Box sx={{display: 'inline-block', float: 'right'}}>
+        <CustomButton id='user-info-button' onClick={handleClick}>
+          <CustomTypography sx={{textTransform: 'initial'}}>
+            {recoilState.nickname}
+          </CustomTypography>
+        </CustomButton>
+
+        <Menu open={open} anchorEl={anchorEl} onClose={handleClose} MenuListProps={{'aria-labelledby': 'user-info-button'}} sx={{"& .MuiMenu-paper": {backgroundColor: 'var(--color1)'}}}>
+          <MenuItem sx={{color: 'var(--color4)'}} onClick={onClickLogout}>로그아웃</MenuItem>
+        </Menu>
+      </Box>
+
+    )
+  }
+
   return(
-    <Box sx={{display: 'block', margin: '30px 0px 30px 0px'}}>
-      <Box sx={{backgroundColor: 'var(--color2)',}}>
+    <Box sx={{margin: '30px 0px 30px 0px'}}>
+      <Box sx={{backgroundColor: 'var(--color2)'}}>
         <CustomButton onClick={onClickMainButton}>
           메인
         </CustomButton>
@@ -190,9 +216,9 @@ const Header = () =>{
         <CustomButton onClick={onClickBoardListButton}>
           게시판
         </CustomButton>
-        {recoilState.isLoggedIn ? <LogoutButton/> : <LoginButton/>}
+        {recoilState.isLoggedIn ? <UserMenu/> : <LoginButton/>}
       </Box>
-      {boardList.boardList ? <BoardDialogComponent/> : null}
+      {boardList.boardList ? <BoardDialog/> : null}
       <Loading open={loading}/>
     </Box>
   )
