@@ -9,7 +9,7 @@ import Loading from "../../component/ui/loading/Loading";
 import { CustomButton } from "../../component/ui/button/CustomButton";
 import { useRecoilState } from "recoil";
 import { userState } from "../../utils/atom";
-import { CustomDialogError } from "../../component/ui/dialog/CustomDialog";
+import { CustomDialogAlarm, CustomDialogError } from "../../component/ui/dialog/CustomDialog";
 
 
 const NOTICE_BOARD_NUMBER = 1;
@@ -20,6 +20,16 @@ const Board = () => {
   const [postInfo, setPostInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [openLoginError, setOpenLoginError] = useState(false);
+  const [errorInfo, setErrorInfo] = useState({
+    open: false,
+    title: null,
+    content: null
+  })
+  const [alarmInfo, setAlarmInfo] = useState({
+    open: false,
+    title: null,
+    content: null
+  })
 
   const location = useLocation();
   const board = location.state?.board;
@@ -82,9 +92,32 @@ const Board = () => {
     )   
   }
 
-  const onClickPost = (e, post) => {
+  const onClickPost = async (e, post) => {
+    setLoading(true);
     e.preventDefault();
-    window.open(`/post?board-name=${board?.name}&id=${post.id}&name=${post.name}&writer=${post.writer}`, '_blank', 'noopener,noreferrer');
+    try{
+      const response = await axiosInstance.get(`posts/disable/${post.id}`);
+
+      if(response.data){
+        window.open(`/post?board-name=${board?.name}&id=${post.id}&name=${post.name}&writer=${post.writer}`, '_blank', 'noopener,noreferrer');
+      } else{
+        setAlarmInfo({
+          open: true,
+          title: '삭제된 게시글',
+          content: '해당 게시글은 삭제된 게시글입니다.'
+        });
+
+        const postList = postInfo.postList.filter(oldPost => oldPost.id !== post.id);
+        setPostInfo({
+          ...postInfo,
+          postList: postList
+        });
+      }
+    } catch(exception){
+      console.log(exception);
+    }
+
+    setLoading(false);
   }
 
   const PostList = () =>{
@@ -108,7 +141,11 @@ const Board = () => {
   const onClickWritePostButton = () => {
 
     if(!recoilState.isLoggedIn){
-      setOpenLoginError(true);
+      setErrorInfo({
+        open: true,
+        title: '권한 없음',
+        content: '로그인 후 사용할 수 있는 기능입니다.\n로그인 후 다시 이용해 주세요.'
+      })
       return;
     }
 
@@ -163,7 +200,14 @@ const Board = () => {
       </CustomBox>
 
       <Loading open={loading}/>
-      <CustomDialogError open={openLoginError} dialogAction={() => setOpenLoginError(false)} title={'권한 없음'} content={'로그인이 필요한 작업입니다.\n로그인 후 다시 이용해 주세요'}/>
+      <CustomDialogError open={errorInfo.open} title={errorInfo.title} content={errorInfo.content} dialogAction={() => setErrorInfo({
+        ...errorInfo,
+        open: false
+      })}/>
+      <CustomDialogAlarm open={alarmInfo.open} title={alarmInfo.title} content={alarmInfo.content} dialogAction={() => setAlarmInfo({
+        ...alarmInfo,
+        open: false
+      })}/>
     </Contents>
   )
 }

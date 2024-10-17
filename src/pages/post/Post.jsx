@@ -230,7 +230,7 @@ const Post = () => {
         setAlarmInfo({
           open: true,
           title: '게시글 삭제 완료',
-          content: '게시글 삭제를 완료했습니다. 현재 열려있는 창을 닫습니다.'
+          content: '게시글 삭제를 완료했습니다.\n현재 열려있는 창을 닫습니다.'
         });
       } catch(exception){
         setErrorInfo({
