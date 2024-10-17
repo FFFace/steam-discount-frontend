@@ -45,3 +45,42 @@ export const CustomDialogError = ({open, dialogAction, title, content}) => {
     </CustomDialog>
   )
 }
+
+export const CustomDialogWarning = ({open, dialogActionAccept, dialogActionCancle, title, content}) => {
+  return(
+    <CustomDialog open={open}>
+      <CustomDialogErrorTitle>
+        {title}
+      </CustomDialogErrorTitle>
+      <CustomDialogContent>
+        {content}
+      </CustomDialogContent>
+      <DialogActions>
+        <CustomButton onClick={dialogActionAccept}>
+          예
+        </CustomButton>
+        <CustomButton onClick={dialogActionCancle}>
+          아니오
+        </CustomButton>
+      </DialogActions>
+    </CustomDialog>
+  )
+}
+
+export const CustomDialogAlarm = ({open, dialogAction, title, content}) => {
+  return(
+    <CustomDialog open={open}>
+      <CustomDialogTitle>
+        {title}
+      </CustomDialogTitle>
+      <CustomDialogContent>
+        {content}
+      </CustomDialogContent>
+      <DialogActions>
+        <CustomButton onClick={dialogAction}>
+          확인
+        </CustomButton>
+      </DialogActions>
+    </CustomDialog>
+  )
+}

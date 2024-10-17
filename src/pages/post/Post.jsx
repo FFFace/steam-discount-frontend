@@ -10,7 +10,7 @@ import ThumbDownAlt from "@mui/icons-material/ThumbDownAlt"
 import Loading from "../../component/ui/loading/Loading"
 import { useRecoilState } from "recoil"
 import { userState } from "../../utils/atom"
-import { CustomDialog, CustomDialogContent, CustomDialogErrorTitle, CustomDialogTitle, CustomDialogError } from "../../component/ui/dialog/CustomDialog"
+import { CustomDialog, CustomDialogContent, CustomDialogErrorTitle, CustomDialogTitle, CustomDialogError, CustomDialogWarning, CustomDialogAlarm } from "../../component/ui/dialog/CustomDialog"
 import { CustomButton, CustomButtonWhite } from "../../component/ui/button/CustomButton"
 import { Viewer } from "@toast-ui/react-editor"
 import '@toast-ui/editor/dist/theme/toastui-editor-dark.css';
@@ -41,6 +41,16 @@ const Post = () => {
   const [postDetailInfo, setPostDetailInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [errorInfo, setErrorInfo] = useState({
+    open: false,
+    title: null,
+    content: null,
+  });
+  const [warningInfo, setWarningInfo] = useState({
+    open: false,
+    title: null,
+    content: null
+  });
+  const [alarmInfo, setAlarmInfo] = useState({
     open: false,
     title: null,
     content: null
@@ -203,6 +213,38 @@ const Post = () => {
       })
     }
 
+    const onClickPostDisable = () => {
+      setWarningInfo({
+        open: true,
+        title: '삭제 주의',
+        content: '정말 게시글을 삭제하시겠습니까?',
+        dialogAction: postDisable
+      });
+    }
+
+    const postDisable = async () => {
+      try{
+        setLoading(true);
+        await axiosInstance.put(`/posts/disable/${postInfo.get('id')}`);
+
+        setAlarmInfo({
+          open: true,
+          title: '게시글 삭제 완료',
+          content: '게시글 삭제를 완료했습니다. 현재 열려있는 창을 닫습니다.'
+        });
+      } catch(exception){
+        setErrorInfo({
+          open: true,
+          title: '삭제 실패',
+          content: '게시글 삭제에 실패했습니다.'
+        });
+
+        console.log(exception);
+      }
+
+      setLoading(false);
+    }
+
     return (
       <>
         <IconButton id='menu-button' aria-controls={open ? 'menu-button' : undefined} aria-haspopup="true" aria-expanded={open ? 'true' : undefined} onClick={handleClick}>
@@ -210,7 +252,7 @@ const Post = () => {
         </IconButton>
         <Menu open={open} anchorEl={anchorEl} onClose={handleClose} MenuListProps={{'aria-labelledby': 'menu-button'}} sx={{"& .MuiMenu-paper": {backgroundColor: 'var(--color1)'}}}>
           <MenuItem sx={{color: 'var(--color4)'}} onClick={onClickPostUpdate}>수정</MenuItem>
-          <MenuItem sx={{color: 'var(--color4)'}}>삭제</MenuItem>
+          <MenuItem sx={{color: 'var(--color4)'}} onClick={onClickPostDisable}>삭제</MenuItem>
         </Menu>
       </>
     )
@@ -557,11 +599,27 @@ const Post = () => {
         
         <CommentTextField depth={0}/>
       </CustomBox>
-      <CustomDialogError open={errorInfo.open} title={errorInfo.title} content={errorInfo.content} dialogAction={() => 
+      <CustomDialogError name='login-error' open={errorInfo.open} title={errorInfo.title} content={errorInfo.content} dialogAction={() => 
         setErrorInfo({
           ...errorInfo,
           open: false
         })}/>
+        <CustomDialogWarning name='post-warning' open={warningInfo.open} title={warningInfo.title} content={warningInfo.content} dialogActionAccept={() => {
+          setWarningInfo({
+            ...warningInfo,
+            open: false
+          });
+
+          warningInfo.dialogAction();
+        }} dialogActionCancle={() => {
+          setWarningInfo({
+            ...warningInfo,
+            open: false
+          });
+        }}/>
+        <CustomDialogAlarm name='post-alarm' open={alarmInfo.open} title={alarmInfo.title} content={alarmInfo.content} dialogAction={() => {
+          window.close();
+        }}/>
       <Loading open={loading}/>
     </Contents>
   )
