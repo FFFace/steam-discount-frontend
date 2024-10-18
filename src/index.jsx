@@ -16,6 +16,7 @@ import WritePost from './pages/post/WritePost';
 import PostList from './pages/post/PostList';
 import Main from './pages/main/Main';
 import Board from './pages/board/Board';
+import MyPage from './pages/user/MyPage';
 
 const theme = createTheme({
   typography: {
@@ -59,6 +60,10 @@ const bodyRouter = createBrowserRouter([
   {
     path: '/write-post',
     element: <WritePost/>
+  },
+  {
+    path: '/my-page',
+    element: <MyPage/>
   },
 ]);
 

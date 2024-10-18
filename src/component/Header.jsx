@@ -75,23 +75,6 @@ const Header = () =>{
     navigate('/login');
   }
 
-  const onClickLogout = async () => {
-    setLoading(true);
-    try{
-      await axiosInstance.post(`/logout`);
-
-    } catch(exception){
-      console.log(exception);
-    }
-
-    setRecoilState({
-      ...recoilState,
-      isLoggedIn: false
-    })
-
-    setLoading(false);
-  }
-
   const LoginButton = () => {
     return (
       <Box sx={{float:'right'}}>
@@ -100,16 +83,6 @@ const Header = () =>{
         </CustomButton>
       </Box>
     );
-  }
-
-  const LogoutButton = () => {
-    return (
-      <Box sx={{float:'right'}}>
-        <CustomButton onClick={onClickLogout}>
-          로그아웃
-        </CustomButton>
-      </Box>
-    )
   }
 
   const onClickMainButton = () => {
@@ -185,6 +158,27 @@ const Header = () =>{
       setAnchorEl(null);
     };
 
+    const onClickLogout = async () => {
+      setLoading(true);
+      try{
+        await axiosInstance.post(`/logout`);
+  
+      } catch(exception){
+        console.log(exception);
+      }
+  
+      setRecoilState({
+        ...recoilState,
+        isLoggedIn: false
+      })
+  
+      setLoading(false);
+    }
+
+    const onClickMyPage = () => {
+      navigate('/my-page');
+    }
+
     return(
       <Box sx={{display: 'inline-block', float: 'right'}}>
         <CustomButton id='user-info-button' onClick={handleClick}>
@@ -194,6 +188,7 @@ const Header = () =>{
         </CustomButton>
 
         <Menu open={open} anchorEl={anchorEl} onClose={handleClose} MenuListProps={{'aria-labelledby': 'user-info-button'}} sx={{"& .MuiMenu-paper": {backgroundColor: 'var(--color1)'}}}>
+          <MenuItem sx={{color: 'var(--color4)'}} onClick={onClickMyPage}>마이페이지</MenuItem>
           <MenuItem sx={{color: 'var(--color4)'}} onClick={onClickLogout}>로그아웃</MenuItem>
         </Menu>
       </Box>
