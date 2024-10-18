@@ -66,9 +66,8 @@ const Post = () => {
   const getCommentList = async (page) => {
     setLoading(true);
     try{
-      const response = await axiosInstance.get(`/posts/comments`, {
+      const response = await axiosInstance.get(`/posts/${postInfo.get('id')}/comments`, {
         params: {
-          postId: postInfo.get('id'),
           page: page
         }
       });
@@ -230,7 +229,10 @@ const Post = () => {
         setAlarmInfo({
           open: true,
           title: '게시글 삭제 완료',
-          content: '게시글 삭제를 완료했습니다.\n현재 열려있는 창을 닫습니다.'
+          content: '게시글 삭제를 완료했습니다.\n현재 열려있는 창을 닫습니다.',
+          dialogAction: () => {
+            window.close();
+          }
         });
       } catch(exception){
         setErrorInfo({
@@ -320,6 +322,43 @@ const Post = () => {
       setUpdated(!updated);
     }
 
+    const onClickDeleteIconButton = (e) => {
+      e.preventDefault();
+
+      setWarningInfo({
+        open: true,
+        title: '삭제 주의',
+        content: '댓글을 정말로 삭제하시겠습니까?',
+        dialogAction: disableComment
+      });
+    }
+
+    const disableComment = async () => {
+      setLoading(true);
+
+      try{
+        await axiosInstance.put(`/posts/comments/disable/${comment.id}`);
+
+        const action = () => window.location.reload();
+        setAlarmInfo({
+          open: true,
+          title: '삭제 완료',
+          content: '댓글을 정상적으로 삭제했습니다.',
+          dialogAction: action
+        });
+      } catch(exception){
+        setErrorInfo({
+          open: true,
+          title: '삭제 실패',
+          content: '댓글 삭제에 실패했습니다.'
+        })
+
+        console.log(exception);
+      }
+
+      setLoading(false);
+    }
+
     const UpdateDeleteIcon = () => {
       return (
         <>
@@ -338,7 +377,7 @@ const Post = () => {
             </IconButton>
             :
             <IconButton sx={{float: 'left'}}>
-              <Delete fontSize="small" sx={{color: 'var(--color4)'}}/>
+              <Delete fontSize="small" onClick={onClickDeleteIconButton} sx={{color: 'var(--color4)'}}/>
             </IconButton>}          
         </>
       )
@@ -410,9 +449,8 @@ const Post = () => {
 
     const onClickMoreReplyButton = async () => {
       try{
-        const response = await axiosInstance.get('/posts/comments/reply', {
+        const response = await axiosInstance.get(`/posts/comments/${parentId}/reply`, {
           params: {
-            parentId: parentId,
             page: reply?.currentPage+1
           }
         })
@@ -618,7 +656,12 @@ const Post = () => {
           });
         }}/>
         <CustomDialogAlarm name='post-alarm' open={alarmInfo.open} title={alarmInfo.title} content={alarmInfo.content} dialogAction={() => {
-          window.close();
+          setAlarmInfo({
+            ...alarmInfo,
+            open: false
+          });
+          
+          alarmInfo.dialogAction();
         }}/>
       <Loading open={loading}/>
     </Contents>
