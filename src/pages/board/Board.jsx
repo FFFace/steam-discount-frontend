@@ -101,12 +101,6 @@ const Board = () => {
       if(response.data){
         window.open(`/post?board-name=${board?.name}&id=${post.id}&name=${post.name}&writer=${post.writer}`, '_blank', 'noopener,noreferrer');
       } else{
-        setAlarmInfo({
-          open: true,
-          title: '삭제된 게시글',
-          content: '해당 게시글은 삭제된 게시글입니다.'
-        });
-
         const newResponse = await axiosInstance.get(`/posts`, {
           params:{
             boardId: board.id,
@@ -124,6 +118,12 @@ const Board = () => {
         setPostInfo({
           ...postInfo,
           postList: postList
+        });
+
+        setAlarmInfo({
+          open: true,
+          title: '삭제된 게시글',
+          content: '해당 게시글은 삭제된 게시글입니다.'
         });
       }
     } catch(exception){
