@@ -14,6 +14,9 @@ export const CustomTextField = ({...props}) => {
         '&.Mui-focused fieldset': {
           border: 'solid 2px gray'
         }
+      },
+      '& .MuiInputBase-input.Mui-disabled': {
+        WebkitTextFillColor: 'var(--color3)'
       }
     }} 
     {...props} />
@@ -32,7 +35,7 @@ export const CustomTextFieldComment1 = ({...props}) => {
         '&.Mui-focused fieldset': {
           border: 'solid 2px gray'
         }
-      }
+      },
     }} 
     {...props} />
   );
