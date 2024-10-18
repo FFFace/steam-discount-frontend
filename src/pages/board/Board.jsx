@@ -107,7 +107,20 @@ const Board = () => {
           content: '해당 게시글은 삭제된 게시글입니다.'
         });
 
+        const newResponse = await axiosInstance.get(`/posts`, {
+          params:{
+            boardId: board.id,
+            page: postInfo.currentPage
+          }
+        });
+
+        const newPostList = newResponse.data.postPageResponseDTOList;
+
         const postList = postInfo.postList.filter(oldPost => oldPost.id !== post.id);
+        if(newPostList.length > 0){
+          postList.push(newPostList.pop());
+        }
+
         setPostInfo({
           ...postInfo,
           postList: postList
@@ -170,7 +183,7 @@ const Board = () => {
     return(
       <Box sx={{margin: '20px 0px 0px 0px', display: 'flex', textAlign: 'center', justifyContent: 'center', border: 'double 6px var(--color1)'}}>
         <CustomButton fullWidth onClick={onClickMorePost}>
-          댓글 더 보기
+          게시글 더 보기
         </CustomButton>
       </Box>
     )
