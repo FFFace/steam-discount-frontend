@@ -3,27 +3,39 @@ import Contents from "../../component/Contents"
 import { CustomBox } from "../../component/ui/box/CustomBox";
 import CustomTypography from "../../component/ui/typography/CustomTypography";
 import { CustomTextField } from "../../component/ui/textField/CustomTextField";
-import { CustomButton } from "../../component/ui/button/CustomButton";
+import { CustomButton, CustomButtonWhite } from "../../component/ui/button/CustomButton";
 import { useEffect, useRef, useState } from "react";
 import Loading from "../../component/ui/loading/Loading";
-import { CustomDialogError } from "../../component/ui/dialog/CustomDialog";
+import { CustomDialogAlarm, CustomDialogError } from "../../component/ui/dialog/CustomDialog";
 import { load } from "react-cookies";
 import { axiosInstance } from "../../utils/axios";
 import { useRecoilState } from "recoil";
 import { userState } from "../../utils/atom";
 
+const passwordRegEx = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}/;
 
 const MyPage = () => {
 
   const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState(null);
+  const [email, setEmail] = useState('nickname');
   const [recoilState, setRecoilState] = useRecoilState(userState);
   const [errorInfo, setErrorInfo] = useState({
     open: false,
     title: null,
     content: null,
-    dialogAction: null
   });
+  const [alarmInfo, setAlarmInfo] = useState({
+    open: false,
+    title: null,
+    content: null,
+    dialogAction: null
+  })
+  const [passwordModify, setPasswordModify] = useState(false);
+  const [passwordModifyInfo, setPasswordModifyInfo] = useState({
+    oldPassword: '',
+    newPassword: '',
+    newPasswordValid: ''
+  })
 
   useEffect(()=>{
     setLoading(true);
@@ -36,29 +48,47 @@ const MyPage = () => {
       } catch(exception){
         console.log(exception);
       }
+      setLoading(false);
     }
 
     getUserInfo();
-
-    setLoading(false);
   }, []);
 
+  const onClickNicknameModify = async (nickname) => {
+    try{
+      setLoading(true);
 
-  const ModifyButton = ({onClickModifyButton, onClickModifyCancleButton}) => {
-    return(
-      <Box sx={{float: 'right'}}>
-        <CustomButton onClick={onClickModifyButton}>
-          변경하기
-        </CustomButton>
-        <CustomButton onClick={onClickModifyCancleButton}>
-          취소
-        </CustomButton>
-      </Box> 
-    )
+      await axiosInstance.patch(`/users/nickname`, {
+        nickname: nickname
+      });
+
+      const dialogAction = () => {
+        setAlarmInfo({
+          open: false
+        });
+
+        window.location.reload();
+      }
+
+      setAlarmInfo({
+        open: true,
+        title: '별명 변경 성공',
+        content: '별명 변경에 성공했습니다.',
+        dialogAction: dialogAction
+      });
+
+    } catch(exception){
+      setErrorInfo({
+        open: false,
+        title: '별명 변경 실패',
+        content: '별명 변경에 실패했습니다.\n다시 시도해 주세요.'
+      })
+    }
+
+    setLoading(false);
   }
 
-  const UserInfo = ({tag, name, value, modifiable}) => {
-
+  const UserInfo = ({name, value, modifiable, action}) => {
     const [disable, setDisable] = useState(false);
     const inputRef = useRef();
 
@@ -66,13 +96,26 @@ const MyPage = () => {
       e.preventDefault();
 
       setDisable(false);
+      inputRef.current.value = value;
     }
-
 
     const onClickModifyButton = (e) => {
       e.preventDefault();
 
-      console.log(inputRef.current?.value);
+      action(inputRef.current?.value);
+    }
+
+    const ModifyButton = ({onClickModifyButton, onClickModifyCancleButton}) => {
+      return(
+        <Box sx={{float: 'right'}}>
+          <CustomButton onClick={onClickModifyButton}>
+            변경하기
+          </CustomButton>
+          <CustomButton onClick={onClickModifyCancleButton}>
+            취소
+          </CustomButton>
+        </Box> 
+      )
     }
 
     return(
@@ -92,13 +135,111 @@ const MyPage = () => {
         </Box>       
         
         {disable ? 
-           <CustomTextField defaultValue={value} inputRef={inputRef}/>
-            :
-            <CustomTextField value={value} disabled/>}
+          <CustomTextField defaultValue={value} inputRef={inputRef}/>
+          :
+          <CustomTextField defaultValue={value} disabled/>}
       </Box>
-        
+    )    
+  }
+
+  const PasswordInfo = () => {
+
+    const oldPasswordRef = useRef();
+    const newPasswordRef = useRef();
+    const newPasswordValidRef = useRef();
+
+    const onClickModifyPassword = async () => {
+
+      if(newPasswordRef.current?.value.length < 8 || !passwordRegEx.test(newPasswordRef.current?.value)){
+        setErrorInfo({
+          open: true,
+          title: '비밀번호 오류',
+          content: '비밀번호는 길이가 8글자 이상 길어야 하며\n숫자, 문자, 특수문자가 1개 이상 포함되어야 합니다.'
+        });
+
+        return;
+      } else if(newPasswordRef.current?.value !== newPasswordValidRef.current?.value){
+        setErrorInfo({
+          open: true,
+          title: '비밀번호 오류',
+          content: '변경할 비밀번호와 비밀번호 확인이 일치하지 않습니다.\n다시 한번 확인해 주세요.'
+        });
+
+        return;
+      }
+
+      try{
+        setLoading(true);
+        await axiosInstance.patch(`/users/password`, {
+            oldPassword: oldPasswordRef.current?.value,
+            newPassword: newPasswordRef.current?.value,
+            newPasswordValid: newPasswordValidRef.current?.value
+        })
+
+        const dialogAction = () => {
+          setAlarmInfo({
+            open:false
+          });
+
+          setPasswordModify(false);
+          setPasswordModifyInfo({
+            oldPassword: '',
+            newPassword: '',
+            newPasswordValid: ''
+          })
+        }
+
+        setAlarmInfo({
+          open: true,
+          title: '비밀번호 변경 성공',
+          content: '정상적으로 비밀번호를 변경했습니다.',
+          dialogAction: dialogAction
+        });
+
+      } catch(exception){
+        setErrorInfo({
+          open: true,
+          title: '비밀번호 변경 실패',
+          content: '비밀번호 변경에 실패했습니다.\n비밀번호 확인 후 다시 한번 시도해 주세요.'
+        });
+      }
+
+      setLoading(false);
+    }
+
+    return (
+      <Box sx={{padding: '10px', borderStyle: 'solid', borderWidth: '3px', borderColor: 'var(--color1)'}}>
+        <CustomTypography sx={{display: 'inline-block', padding: '5px'}}>
+          현재 비밀번호
+          </CustomTypography>
+        <CustomTextField name='oldPassword' type='password' inputRef={oldPasswordRef}/>
+
+        <Box sx={{margin: '0px 0px 10px 0px'}}>
+          <CustomTypography sx={{display: 'inline-block', padding: '5px'}}>
+            변경할 비밀번호
+          </CustomTypography >
+        </Box>
+        <CustomTextField name='newPassword' type='password' inputRef={newPasswordRef}/>
+
+        <Box sx={{margin: '0px 0px 10px 0px'}}>
+          <Box sx={{margin: '0px 0px 10px 0px'}}>
+            <CustomTypography sx={{display: 'inline-block', padding: '5px'}}>
+              변경할 비밀번호 확인
+            </CustomTypography>
+            <Box sx={{float: 'right'}}>       
+          </Box>
+          </Box> 
+        </Box>
+        <CustomTextField name='newPasswordValid' type='password' inputRef={newPasswordValidRef}/>
+
+        <CustomButtonWhite onClick={onClickModifyPassword}>비밀번호 변경하기</CustomButtonWhite>
+      </Box>
     )
-    
+  }
+
+  const onClickPasswordModifyButton = (e) => {
+    e.preventDefault();
+    setPasswordModify(!passwordModify);
   }
 
   return(
@@ -112,12 +253,20 @@ const MyPage = () => {
       </CustomBox>
         
       <CustomBox>
-        <UserInfo tag={'email'} name={'이메일'} value={email} />
-        <UserInfo tag={'nickname'} name={'별명'} value={recoilState.nickname} modifiable={true}/>
-        <UserInfo tag={'password'} name={'비밀번호 변경'} modifiable={true}/>
-        <UserInfo tag={'password-check'} name={'비밀번호 변경 확인'} modifiable={true}/>
+        <UserInfo tag={'email'} name={'이메일'} value={email || 'email'} />
+        <UserInfo tag={'nickname'} name={'별명'} value={recoilState.nickname || 'nickname'} modifiable={true} action={onClickNicknameModify}/>
+        {passwordModify ? <PasswordInfo/> : null}
+
+        <Box sx={{padding: '10px'}}>
+          <CustomButtonWhite onClick={onClickPasswordModifyButton}>{passwordModify ? '비밀번호 변경 취소' : '비밀번호 변경'}</CustomButtonWhite>
+        </Box>
+       
       </CustomBox>
-      <CustomDialogError open={errorInfo.open}/>
+      <CustomDialogError open={errorInfo.open} title={errorInfo.title} content={errorInfo.content} dialogAction={() => setErrorInfo({
+        ...errorInfo,
+        open: false
+      })}/>
+      <CustomDialogAlarm open={alarmInfo.open} title={alarmInfo.title} content={alarmInfo.content} dialogAction={alarmInfo.dialogAction}/>
       <Loading open={loading}/>
     </Contents>
   )
