@@ -17,6 +17,7 @@ import PostList from './pages/post/PostList';
 import Main from './pages/main/Main';
 import Board from './pages/board/Board';
 import MyPage from './pages/user/MyPage';
+import WritedPostList from './pages/user/WritedPostList';
 
 const theme = createTheme({
   typography: {
@@ -65,6 +66,10 @@ const bodyRouter = createBrowserRouter([
     path: '/my-page',
     element: <MyPage/>
   },
+  {
+    path: '/writed-post-list',
+    element: <WritedPostList/>
+  }
 ]);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

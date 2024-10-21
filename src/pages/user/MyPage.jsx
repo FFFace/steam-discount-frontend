@@ -11,6 +11,7 @@ import { load } from "react-cookies";
 import { axiosInstance } from "../../utils/axios";
 import { useRecoilState } from "recoil";
 import { userState } from "../../utils/atom";
+import { useNavigate } from "react-router-dom";
 
 const passwordRegEx = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}/;
 
@@ -24,18 +25,22 @@ const MyPage = () => {
     title: null,
     content: null,
   });
+
   const [alarmInfo, setAlarmInfo] = useState({
     open: false,
     title: null,
     content: null,
     dialogAction: null
-  })
+  });
+
   const [passwordModify, setPasswordModify] = useState(false);
   const [passwordModifyInfo, setPasswordModifyInfo] = useState({
     oldPassword: '',
     newPassword: '',
     newPasswordValid: ''
-  })
+  });
+
+  const navigate = useNavigate();
 
   useEffect(()=>{
     setLoading(true);
@@ -150,10 +155,18 @@ const MyPage = () => {
 
     const onClickModifyPassword = async () => {
 
-      if(newPasswordRef.current?.value.length < 8 || !passwordRegEx.test(newPasswordRef.current?.value)){
+      if(oldPasswordRef.current?.value.length < 1){
         setErrorInfo({
           open: true,
-          title: '비밀번호 오류',
+          title: '비밀번호 변경 오류',
+          content: '현재 비밀번호를 입력해 주세요.'
+        });
+
+      }
+      else if(newPasswordRef.current?.value.length < 8 || !passwordRegEx.test(newPasswordRef.current?.value)){
+        setErrorInfo({
+          open: true,
+          title: '비밀번호 변경 오류',
           content: '비밀번호는 길이가 8글자 이상 길어야 하며\n숫자, 문자, 특수문자가 1개 이상 포함되어야 합니다.'
         });
 
@@ -161,7 +174,7 @@ const MyPage = () => {
       } else if(newPasswordRef.current?.value !== newPasswordValidRef.current?.value){
         setErrorInfo({
           open: true,
-          title: '비밀번호 오류',
+          title: '비밀번호 변경 오류',
           content: '변경할 비밀번호와 비밀번호 확인이 일치하지 않습니다.\n다시 한번 확인해 주세요.'
         });
 
@@ -242,6 +255,12 @@ const MyPage = () => {
     setPasswordModify(!passwordModify);
   }
 
+  const onClickWritedPostList = (e) => {
+    e.preventDefault();
+    
+    navigate('/writed-post-list');
+  }
+
   return(
     <Contents>
       <CustomBox>
@@ -259,6 +278,7 @@ const MyPage = () => {
 
         <Box sx={{padding: '10px'}}>
           <CustomButtonWhite onClick={onClickPasswordModifyButton}>{passwordModify ? '비밀번호 변경 취소' : '비밀번호 변경'}</CustomButtonWhite>
+          <CustomButtonWhite onClick={onClickWritedPostList}>내가 쓴 글</CustomButtonWhite>
         </Box>
        
       </CustomBox>

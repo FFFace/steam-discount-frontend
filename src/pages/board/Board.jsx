@@ -14,6 +14,30 @@ import { CustomDialogAlarm, CustomDialogError } from "../../component/ui/dialog/
 
 const NOTICE_BOARD_NUMBER = 1;
 
+export const PostListTypographyTitle = ({children}) => {
+  return (
+    <CustomTypography sx={{margin: '0px 0px 0px 5px', display: 'inline-block', width: '60%', textAlign: 'left', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap'}}>
+      {children}
+    </CustomTypography>
+  )
+}
+
+export const PostListTypographyWriter = ({children}) => {
+  return (
+    <CustomTypography sx={{display: 'inline-block', width: '18%', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap'}}>
+      {children}
+    </CustomTypography>
+  )    
+}
+
+export const PostListTypographyThumbs = ({children}) => {
+  return (
+    <CustomTypography sx={{display: 'inline-block', width: '15%', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', textAlign: 'center'}}>
+      {children}
+    </CustomTypography>
+  )   
+}
+
 const Board = () => {
 
   const [totalPage, setTotalPage] = useState(0);
@@ -68,30 +92,6 @@ const Board = () => {
     getPostList(0);
   }, [board]);
 
-  const PostListTypographyTitle = ({children}) => {
-    return (
-      <CustomTypography sx={{margin: '0px 0px 0px 5px', display: 'inline-block', width: '60%', textAlign: 'left', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap'}}>
-        {children}
-      </CustomTypography>
-    )
-  }
-
-  const PostListTypographyWriter = ({children}) => {
-    return (
-      <CustomTypography sx={{display: 'inline-block', width: '18%', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap'}}>
-        {children}
-      </CustomTypography>
-    )    
-  }
-
-  const PostListTypographyThumbs = ({children}) => {
-    return (
-      <CustomTypography sx={{display: 'inline-block', width: '15%', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', textAlign: 'center'}}>
-        {children}
-      </CustomTypography>
-    )   
-  }
-
   const onClickPost = async (e, post) => {
     setLoading(true);
     e.preventDefault();
@@ -99,7 +99,7 @@ const Board = () => {
       const response = await axiosInstance.get(`posts/disable/${post.id}`);
 
       if(response.data){
-        window.open(`/post?board-name=${board?.name}&id=${post.id}&name=${post.name}&writer=${post.writer}`, '_blank', 'noopener,noreferrer');
+        window.open(`/post?board-name=${post.boardName}&id=${post.id}&name=${post.name}&writer=${post.writer}`, '_blank', 'noopener,noreferrer');
       } else{
         const newResponse = await axiosInstance.get(`/posts`, {
           params:{

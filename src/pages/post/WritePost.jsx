@@ -15,7 +15,9 @@ import { TrySharp } from "@mui/icons-material";
 import Loading from "../../component/ui/loading/Loading";
 import { useRecoilState } from "recoil";
 import { userState } from "../../utils/atom";
-
+import { deleteObject, getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
+import { storage } from "../../utils/firebase";
+import { v4 as uuidv4 } from "uuid";
 
 const WritePost = () => {
 
@@ -30,6 +32,8 @@ const WritePost = () => {
 
   const [loading, setLoading] = useState(false);
 
+  let images = [];
+
   useEffect(() => {
     const getPost = async () => {
       try{
@@ -42,25 +46,32 @@ const WritePost = () => {
 
     if(postInfo?.updated)
       getPost();
+
+    const editorIns = editorRef.current.getInstance();
+    editorIns.removeHook('addImageBlobHook');
+    editorIns.addHook('addImageBlobHook', uploadImage);
   }, [])
 
   const PCEditor = () => {
     return(
       <Editor 
-         placeholder="내용을 입력해 주세요."
-         previewStyle="tab"
-         initialEditType="wysiwyg"
+         placeholder="내용을 입력해 주세요." 
+         previewStyle="tab" 
+         initialEditType="wysiwyg" 
          language='ko-KR' 
          height='500px' 
          theme='dark'
-         hideModeSwitch='true'
-         initialValue={postInfo?.content ? postInfo.content : ""}
-         ref={editorRef}
+         hideModeSwitch='true' 
+         initialValue={postInfo?.content ? postInfo.content : ""} 
+         ref={editorRef} 
          toolbarItems={[
           ['heading', 'bold', 'italic', 'strike'],
           ['ul', 'ol'],
           ['image', 'link']
-         ]}/>
+         ]} 
+         hooks={{
+          addImageBlobHook: uploadImage
+         }}/>
     )
   }
 
@@ -80,12 +91,58 @@ const WritePost = () => {
          toolbarItems={[
           ['heading', 'bold', 'italic', 'strike'],
           ['ul', 'ol'],
-         ]}/>
+         ]}
+         />
     )
+  }
+
+  const uploadImage = async (blob, showImage) => {
+    const uuid = uuidv4();
+    const storageRef = ref(storage, `images/${uuid}`);
+
+    try{
+      const snapshot = await uploadBytes(storageRef, blob);
+      const url = await getDownloadURL(snapshot.ref);
+
+      images.push({
+        name: uuid,
+        url: url
+      });
+
+      showImage(url, 'image');
+    } catch(exception){
+      console.log(exception);
+    }
+  }
+
+  const findMissingImage = (content) => {
+    let missings = [];
+
+    if(images.length > 0){
+      for(const image of images){
+        if(!content.includes(image.url)){          
+          missings.push(image.name);
+        }
+      }
+    }
+
+    return missings
   }
 
   const onClickWritePostButton = async () => {
     setLoading(true);
+
+    const missings = findMissingImage(editorRef.current.getInstance().getMarkdown());
+
+    if(missings.length > 0){
+      missings.map(async name => {
+        const storageRef = ref(storage, `images/${name}`);
+        await deleteObject(storageRef);
+
+        images = images.filter(image => name !== image.name);
+      })
+    }
+
     try{
         const response = await axiosInstance.post(`/posts`, {
           boardId: board.id,
@@ -93,10 +150,11 @@ const WritePost = () => {
           content: editorRef.current.getInstance().getMarkdown()
         });
 
-        window.open(`/post?board-name=${board.name}&id=${response.data}&name=${postNameRef.current.value}&writer=${recoilState.nickname}`, 'noopener,noreferrer');
+        window.open(`/post?board-name=${board.name}&id=${response.data}&name=${postNameRef.current.value}&writer=${recoilState.nickname}`, '_self');
     } catch(exception){
       console.log(exception);
     }
+
     setLoading(false);
   }
 
@@ -109,7 +167,7 @@ const WritePost = () => {
         content: editorRef.current?.getInstance().getMarkdown()
       });
 
-      window.open(`/post?board-name=${board.name}&id=${postInfo.id}&name=${postInfo.name}&writer=${recoilState.nickname}`, 'noopener,noreferrer');
+      window.open(`/post?board-name=${board.name}&id=${postInfo.id}&name=${postInfo.name}&writer=${recoilState.nickname}`, '_self');
     } catch(exception){
       console.log(exception);
     }
