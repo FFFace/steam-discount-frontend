@@ -14,6 +14,7 @@ import { saveAccessToken } from "../../utils/storage";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { CustomLink } from "../../component/ui/Link/CustomLink";
+import { PostListTypographyThumbs, PostListTypographyTitle, PostListTypographyWriter } from "../board/Board";
 
 const DISCOUNT_SAMPLE_MAX_COUNT = 4;
 
@@ -25,6 +26,7 @@ const Main = () => {
   const [loading, setLoading] = useState(false);
   const [itemNum, setItemNum] = useState(0);
   const [notice, setNotice] = useState(null);
+  const [newPostList, setNewPostList] = useState(null);
 
   const [state, setState] = useRecoilState(userState);
 
@@ -37,7 +39,7 @@ const Main = () => {
         setDiscountList(response.data);
 
       } catch(exception){
-
+        console.log(exception);
       }
     }
 
@@ -47,7 +49,18 @@ const Main = () => {
 
         setNotice(response.data);
       } catch(exception){
+        console.log(exception);
+      }
+    }
 
+    const getNewPostList = async () => {
+      try{
+        const response = await axiosInstance.get('/posts/main-new-post-list');
+
+        setNewPostList(response.data);
+
+      } catch(exception){
+        console.log(exception);
       }
 
       setLoading(false);
@@ -55,6 +68,7 @@ const Main = () => {
 
     getRandomDiscountFive();
     mainNotice();
+    getNewPostList();
   }, [])
 
   const onClickDiscountRightButton = () => {
@@ -78,7 +92,7 @@ const Main = () => {
     window.open(`/post?board-name=공지사항&id=${notice.id}&name=${notice.name}&writer=${notice.writer}`, '_blank', 'noopener,noreferrer')
   }
 
-  const NoticeComponent = () => {
+  const Notice = () => {
     return(
       <Link href={`/post?board-name=공지사항&id=${notice.id}&name=${notice.name}&writer=${notice.writer}`} target="_blink" onClick={onClickNewNotice} style={{ textDecoration: 'none' }}>
         <CustomTypography>
@@ -86,6 +100,36 @@ const Main = () => {
         </CustomTypography>
       </Link>
     )
+  }
+
+  const NewPostList = () => {
+    return newPostList.map(post => (
+      <Box key={post.id} sx={{borderBottomStyle: 'solid', borderWidth: '3px', borderColor: 'var(--color1)', padding: '2px'}}>
+        <Link onClick={(e) => onClickPost(e, post)}>
+          <PostListTypographyTitle>{post.name}</PostListTypographyTitle>
+        </Link>
+        <PostListTypographyWriter>{post.boardName}</PostListTypographyWriter>
+        <PostListTypographyThumbs>{post.thumbsUp}</PostListTypographyThumbs>
+      </Box>
+    ));
+  }
+
+  const onClickPost = async (e, post) => {
+    setLoading(true);
+    e.preventDefault();
+    try{
+      const response = await axiosInstance.get(`posts/disable/${post.id}`);
+
+      if(response.data){
+        window.open(`/post?board-name=${post.boardName}&id=${post.id}&name=${post.name}&writer=${post.writer}`, '_blank', 'noopener,noreferrer');
+      } else{
+        window.location.reload();
+      }
+    } catch(exception){
+      console.log(exception);
+    }
+
+    setLoading(false);
   }
 
   const DiscountTitle = () => {
@@ -129,12 +173,14 @@ const Main = () => {
         <CustomTypography variant='h5' sx={{padding: '10px'}}>
           최신 공지
         </CustomTypography>
-        <Box sx={{borderTopStyle: 'solid', borderBottomStyle: 'solid', borderWidth: '3px', borderColor: 'var(--color1)'}}>
-          <Box sx={{padding: '10px'}}>
-            {notice ? <NoticeComponent/> : null}
+      </CustomBox>
+
+      <CustomBox>
+        <Box sx={{borderBottomStyle: 'solid', borderWidth: '3px', borderColor: 'var(--color1)', padding: '0px 0px 0px 10px'}}>
+          <Box sx={{padding: '5px'}}>
+            {notice ? <Notice/> : null}
           </Box>
         </Box>
-
       </CustomBox>
 
       <CustomBox>
@@ -165,7 +211,27 @@ const Main = () => {
             할인 더 보기
           </CustomButton>
         </Box>
+      </CustomBox>
+
+      <CustomBox>
+        <CustomTypography variant='h5' sx={{padding: '10px'}}>
+          최신 게시글
+        </CustomTypography>
       </CustomBox>      
+
+      <CustomBox>
+        <Box sx={{padding: '0px 0px 0px 10px'}}>
+          <PostListTypographyTitle>제목</PostListTypographyTitle>
+          <PostListTypographyWriter>게시판</PostListTypographyWriter>
+          <PostListTypographyThumbs>작성일</PostListTypographyThumbs>
+        </Box>          
+      </CustomBox>
+
+      <CustomBox>
+        <Box sx={{padding: '0px 0px 0px 10px'}}>
+          {newPostList ? <NewPostList/> : null}
+        </Box>        
+      </CustomBox>
       <Loading open={loading}/>
     </Contents> 
   )
