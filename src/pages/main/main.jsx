@@ -223,7 +223,7 @@ const Main = () => {
         <Box sx={{padding: '0px 0px 0px 10px'}}>
           <PostListTypographyTitle>제목</PostListTypographyTitle>
           <PostListTypographyWriter>게시판</PostListTypographyWriter>
-          <PostListTypographyThumbs>작성일</PostListTypographyThumbs>
+          <PostListTypographyThumbs>추천수</PostListTypographyThumbs>
         </Box>          
       </CustomBox>
 
