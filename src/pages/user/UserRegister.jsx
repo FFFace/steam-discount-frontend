@@ -159,8 +159,10 @@ const UserRegister = () => {
       if(info.email === '')
         return;
 
-      const response = await axiosInstance.post(`/users/duplicate-email`, {
-        email: info.email
+      const response = await axiosInstance.get(`/users/duplicate-email`, {
+        params: {
+          email: info.email
+        }
       });
 
       setDuplicate({
@@ -190,8 +192,10 @@ const UserRegister = () => {
       if(info.nickname === '')
         return;
 
-      const response = await axiosInstance.post(`/users/duplicate-nickname`, {
-        nickname: info.nickname
+      const response = await axiosInstance.get(`/users/duplicate-nickname`, {
+        params: {
+          nickname: info.nickname
+        }        
       });
 
       setDuplicate({

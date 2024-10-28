@@ -1,4 +1,5 @@
-import { Dialog, DialogContent, DialogTitle } from "@mui/material";
+import { Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
+import { CustomButton } from "../button/CustomButton";
 
 
 export const CustomDialog = (props) => {
@@ -23,6 +24,63 @@ export const CustomDialogErrorTitle = (props) => {
 
 export const CustomDialogContent = (props) => {
   return(
-    <DialogContent sx={{color: 'var(--color4)'}} {...props}>{props.children}</DialogContent>
+    <DialogContent sx={{color: 'var(--color4)', whiteSpace: 'pre-line'}} {...props}>{props.children}</DialogContent>
   );
+}
+
+export const CustomDialogError = ({open, dialogAction, title, content}) => {
+  return(
+    <CustomDialog open={open}>
+      <CustomDialogErrorTitle>
+        {title}
+      </CustomDialogErrorTitle>
+      <CustomDialogContent>
+        {content}
+      </CustomDialogContent>
+      <DialogActions>
+        <CustomButton onClick={dialogAction}>
+          확인
+        </CustomButton>
+      </DialogActions>
+    </CustomDialog>
+  )
+}
+
+export const CustomDialogWarning = ({open, dialogActionAccept, dialogActionCancle, title, content}) => {
+  return(
+    <CustomDialog open={open}>
+      <CustomDialogErrorTitle>
+        {title}
+      </CustomDialogErrorTitle>
+      <CustomDialogContent>
+        {content}
+      </CustomDialogContent>
+      <DialogActions>
+        <CustomButton onClick={dialogActionAccept}>
+          예
+        </CustomButton>
+        <CustomButton onClick={dialogActionCancle}>
+          아니오
+        </CustomButton>
+      </DialogActions>
+    </CustomDialog>
+  )
+}
+
+export const CustomDialogAlarm = ({open, dialogAction, title, content}) => {
+  return(
+    <CustomDialog open={open}>
+      <CustomDialogTitle>
+        {title}
+      </CustomDialogTitle>
+      <CustomDialogContent>
+        {content}
+      </CustomDialogContent>
+      <DialogActions>
+        <CustomButton onClick={dialogAction}>
+          확인
+        </CustomButton>
+      </DialogActions>
+    </CustomDialog>
+  )
 }

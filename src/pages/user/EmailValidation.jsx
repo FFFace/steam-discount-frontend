@@ -28,7 +28,7 @@ const EmailValidation = () => {
     setLoading(true);
 
     try{
-      const response = await axiosInstance.post('/users/verify', {
+      const response = await axiosInstance.patch('/users/verify', {
         email: verifyEmail,
         code: verifyCode,
       }
