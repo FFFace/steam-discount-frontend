@@ -204,12 +204,14 @@ const Main = () => {
             {discountList ? <DiscountTitle/> : null}
             {discountList ? <DiscountPayload/> : null}
           </Box>
-          <CustomButton sx={{ color: 'var(--color4)',":hover": {
+          <Box >
+          <CustomButton sx={{ color: 'var(--color4)', textAlign: 'right', ":hover": {
             background: 'var(--color2)'
-            }, 
-            margin: '-40px 0px',float: 'right'}} onClick={onClickMoreDiscoutList}>
+            }}} onClick={onClickMoreDiscoutList}>
             할인 더 보기
           </CustomButton>
+          </Box>
+
         </Box>
       </CustomBox>
 
