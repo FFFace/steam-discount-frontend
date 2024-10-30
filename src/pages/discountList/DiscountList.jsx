@@ -8,8 +8,10 @@ import { CustomBox } from "../../component/ui/box/CustomBox";
 import Loading from "../../component/ui/loading/Loading";
 import { CustomButton } from "../../component/ui/button/CustomButton";
 import { useNavigate } from "react-router-dom";
-import { CustomDialogWarning } from "../../component/ui/dialog/CustomDialog";
+import { CustomDialogError, CustomDialogWarning } from "../../component/ui/dialog/CustomDialog";
 import { ColorizeSharp } from "@mui/icons-material";
+import { useRecoilState } from "recoil";
+import { userState } from "../../utils/atom";
 
 
 
@@ -19,6 +21,7 @@ const Link = styled.a`
 
 const DiscountList = () => {
 
+  const [recoilState, setRecoilState] = useRecoilState(userState);
   const [discountList, setDiscountList] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -29,14 +32,21 @@ const DiscountList = () => {
     content: null,
     dialogActionAccept: null,
     dialogActionCancel: null
-  })
+  });
+
+  const [errorInfo, setErrorInfo] = useState({
+    open: false,
+    title: null,
+    content: null,
+    dialogAction: null
+  }) 
 
   const [alarmInfo, setAlarmInfo] = useState({
     open: false,
     title: null,
     content: null,
     dialogAction: null
-  })
+  });
 
   const onClickGoBoard = async (boardName) => {
     setLoading(true);
@@ -59,18 +69,34 @@ const DiscountList = () => {
       if(exception.response.status === 400){
 
         const dialogAccept = async () => {
-          console.log('aaa')
+
+          if(!recoilState.isLoggedIn){
+
+            const dialogAccept  = () => {
+              setErrorInfo({open:false});
+            }
+
+            setErrorInfo({
+              open: true,
+              title: '권한 없음',
+              content: '로그인이 필요한 작업입니다.\n로그인 후 다시 이용해 주세요.',
+              dialogAccept: dialogAccept
+            });
+
+            return;
+          }
+
           try{
             await axiosInstance.post(`/boards`, {
               boardName: boardName
-            })
+            });
 
             setAlarmInfo({
               open: true,
               title: '게시판 생성 완료',
               content: '게시판 생성에 성공했습니다.\n해당 게시판으로 이동합니다',
               dialogAction: onClickGoBoard(boardName)
-            })
+            });
           } catch(exception){
             console.log(exception);
           }
@@ -131,13 +157,37 @@ const DiscountList = () => {
     getDiscountList();
   }, []);
 
+  const onClickUpdateDiscountList = async (e) => {
+    e.preventDefault();
+    
+    setLoading(true);
+    try{
+      await axiosInstance.get('/new-discount');
+      window.location.reload();
+    } catch(exception){
+      console.log(exception);
+    }
+    
+    setLoading(false);
+  }
+
   return(
     <Contents>
       <CustomBox>
         <Box sx={{padding: '10px'}}>
-          <CustomTypography variant='h5'>
-            스팀 할인 목록 100
-          </CustomTypography>
+          <Box sx={{display: 'inline-block'}}>
+            <CustomTypography variant='h5'>
+              스팀 할인 목록 100
+            </CustomTypography>
+          </Box>
+
+          {recoilState.role === 'ADMIN' ? 
+            <Box sx={{display: 'inline-block', float: 'right'}}>
+            <CustomButton onClick={onClickUpdateDiscountList}>
+              최신화
+            </CustomButton>
+          </Box> : null}
+
         </Box>
       </CustomBox>
       {discountList ? <DiscountList/> : <></>}
@@ -147,6 +197,8 @@ const DiscountList = () => {
           open: false
         })
       }}/>
+
+      <CustomDialogError open={errorInfo.open} title={errorInfo.title} content={errorInfo.content} dialogAction={errorInfo.dialogAction}/>
       <Loading open={loading} />
     </Contents>
   );
