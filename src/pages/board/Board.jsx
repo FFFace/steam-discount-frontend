@@ -193,9 +193,14 @@ const Board = () => {
     <Contents>
       <CustomBox>
         <Box sx={{padding: '10px'}}>
-          <Button size='large' onClick={onClickWritePostButton} sx={{color: 'var(--color4)', float: 'right', ":hover": {background: 'var(--color2)'}}}>
-            글쓰기
-          </Button>
+          {board?.id !== 1 ? 
+            <Button size='large' onClick={onClickWritePostButton} sx={{color: 'var(--color4)', float: 'right', ":hover": {background: 'var(--color2)'}}}>
+              글쓰기
+            </Button> :
+          (board?.id === 1 && recoilState.role==='ADMIN') ? 
+            <Button size='large' onClick={onClickWritePostButton} sx={{color: 'var(--color4)', float: 'right', ":hover": {background: 'var(--color2)'}}}>
+              글쓰기
+            </Button> : null}
           <CustomTypography variant='h5'>
             {board?.name}
           </CustomTypography>
