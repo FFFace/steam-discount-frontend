@@ -18,6 +18,7 @@ import { userState } from "../../utils/atom";
 import { deleteObject, getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { storage } from "../../utils/firebase";
 import { v4 as uuidv4 } from "uuid";
+import axios from "axios";
 
 const WritePost = () => {
 
@@ -97,19 +98,39 @@ const WritePost = () => {
   }
 
   const uploadImage = async (blob, showImage) => {
-    const uuid = uuidv4();
-    const storageRef = ref(storage, `images/${uuid}`);
 
     try{
-      const snapshot = await uploadBytes(storageRef, blob);
-      const url = await getDownloadURL(snapshot.ref);
+      const response = await axiosInstance.get('/posts/firebase/upload-url', {
+        params:{
+          contentType: blob.type
+        }
+      });
+
+      const uploadURL = response.data;
+
+      await axios.put(uploadURL, blob, {
+        headers: {
+          'Content-Type': blob.type
+        }
+      });
+      
+      const blobName = uploadURL.split('images/')[1].split('?')[0];
+
+      await axiosInstance.get(`/posts/firebase/blob-make-public`, {
+        params: {
+          blobName: blobName
+        }
+      });
+
+      const url = uploadURL.split('?')[0]
 
       images.push({
-        name: uuid,
+        name: blobName,
         url: url
       });
 
-      showImage(url, 'image');
+      showImage(url);
+
     } catch(exception){
       console.log(exception);
     }
@@ -136,10 +157,15 @@ const WritePost = () => {
 
     if(missings.length > 0){
       missings.map(async name => {
-        const storageRef = ref(storage, `images/${name}`);
-        await deleteObject(storageRef);
-
-        images = images.filter(image => name !== image.name);
+        try{
+          await axiosInstance.delete(`/posts/firebase/delete`, {
+            params: {
+              blobName: name
+            }
+          });
+        } catch(exception){
+          console.log(exception);
+        }
       })
     }
 
