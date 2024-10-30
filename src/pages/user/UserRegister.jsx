@@ -76,7 +76,7 @@ const UserRegister = () => {
     setLoading(true);
 
     try{
-      await axiosInstance.post('/users', {
+      await axiosInstance.post('/users/create', {
           email: info.email,
           password: info.password,
           nickname: info.nickname

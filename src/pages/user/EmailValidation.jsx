@@ -66,7 +66,7 @@ const EmailValidation = () => {
 
   const onClickAcceptAtSuccess = () => {
     onClickAccept();
-    navigate('/login');
+    navigate('/');
   }
 
   const VerifyFailDialog = () => {
@@ -94,7 +94,7 @@ const EmailValidation = () => {
         <CustomDialogTitle>인증 성공</CustomDialogTitle>
         <CustomDialogContent>
           감사합니다. 회원가입이 완료되었습니다.<br/>
-          로그인 화면으로 이동합니다.
+          메인 페이지로 이동합니다.
         </CustomDialogContent>
         <DialogActions>
           <CustomButton onClick={onClickAcceptAtSuccess}>
