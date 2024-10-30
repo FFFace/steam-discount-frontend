@@ -175,7 +175,13 @@ const Header = () =>{
       setLoading(false);
     }
 
-    const onClickMyPage = () => {
+    const onClickAdminPage = (e) => {
+      e.preventDefault();
+      navigate('/admin-page');
+    }
+
+    const onClickMyPage = (e) => {
+      e.preventDefault();
       navigate('/my-page');
     }
 
@@ -188,7 +194,8 @@ const Header = () =>{
         </CustomButton>
 
         <Menu open={open} anchorEl={anchorEl} onClose={handleClose} MenuListProps={{'aria-labelledby': 'user-info-button'}} sx={{"& .MuiMenu-paper": {backgroundColor: 'var(--color1)'}}}>
-          <MenuItem sx={{color: 'var(--color4)'}} onClick={onClickMyPage}>마이페이지</MenuItem>
+          <MenuItem sx={{color: 'var(--color4)'}} onClick={onClickMyPage}>마이 페이지</MenuItem>
+          {recoilState.role === 'ADMIN' ? <MenuItem sx={{color: 'var(--color4)'}} onClick={onClickAdminPage}>관리자 페이지</MenuItem> : null}
           <MenuItem sx={{color: 'var(--color4)'}} onClick={onClickLogout}>로그아웃</MenuItem>
         </Menu>
       </Box>
