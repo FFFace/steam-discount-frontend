@@ -168,9 +168,13 @@ const Header = () =>{
       }
   
       setRecoilState({
-        ...recoilState,
-        isLoggedIn: false
+        isLoggedIn: false,
+        nickname: null,
+        role: null
       })
+
+      removeAccessToken();
+      removeRefreshToken();
   
       setLoading(false);
     }

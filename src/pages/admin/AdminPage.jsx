@@ -20,7 +20,7 @@ const CustomTabPanel = (props) => {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && <Box sx={{ p: 1 }}>{children}</Box>}
+      {value === index && <Box>{children}</Box>}
     </div>
   );
 }
@@ -57,6 +57,22 @@ export const UserListTypographyDiable = ({children}) => {
   )
 }
 
+export const BoardListTypographyName = ({children}) => {
+  return (
+    <CustomTypography sx={{margin: '0px 0px 0px 5px', display: 'inline-block', width: '70%', textAlign: 'left', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap'}}>
+      {children}
+    </CustomTypography>
+  )
+}
+
+export const BoardListTypographyPostCount = ({children}) => {
+  return (
+    <CustomTypography sx={{margin: '0px 0px 0px 5px', display: 'inline-block', width: '25%', textAlign: 'center', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap'}}>
+      {children}
+    </CustomTypography>
+  )
+}
+
 const AdminPage = () => {
 
   const [recoilState, setRecoilState] = useRecoilState(userState);
@@ -66,30 +82,70 @@ const AdminPage = () => {
   const [boardList, setBoardList] = useState(null);
   const [postList, setPostList] = useState(null);
 
+  const [errorInfo, setErrorInfo] = useState({
+    open: false,
+    title: null,
+    content: null,
+    dialogAction: null
+  });
+
   const navigate = useNavigate();
 
-  if(!recoilState.isLoggedIn || recoilState?.role !== 'ADMIN') {
-    navigate('/');
-  }
-
-  const getUserList = async () => {
+  useEffect(() => {
     setLoading(true);
 
-    try{
-      const response = await axiosInstance('/users/all');
+    const errorGetListFailInit = (content) =>{
+      setErrorInfo({
+        open: true,
+        title: '목록 갱신 실패',
+        content: content,
+        dialogAction: errorDialogAction
+      });
+    }
+  
+    const errorDialogAction = () => {
+      navigate('/');
+    }
+  
+    const getUserList = async () => {
+      try{
+        const response = await axiosInstance.get('/users/all');
+  
+        setUserList(response.data);
+  
+      } catch(exception){
+        const content = '사용자 목록 갱신에 실패했습니다.\n메인 페이지로 돌아갑니다.'
+        errorGetListFailInit(content);
+  
+        console.log(exception);
+      }
 
-      setUserList(response.data);
+    }
+  
+    const getBoardList = async () => {
+      try{
+        const resposne = await axiosInstance.get('/boards');
+  
+        setBoardList(resposne.data);
+      } catch(exception){
+        const content = '게시판 목록 갱신에 실패했습니다.\n메인 페이지로 돌아갑니다.'
+        errorGetListFailInit(content);
+  
+        console.log(exception);
+      }    
 
-    } catch(exception){
-      console.log(exception);
+      setLoading(false);
     }
 
-    setLoading(false);
-  }
-
-  useEffect(() => {
     getUserList();
+    getBoardList();
   }, []);
+
+  useEffect(()=>{
+    if(!recoilState.isLoggedIn || recoilState.role !== 'ADMIN') {
+      navigate('/');
+    }
+  }, [recoilState]);
 
   const changeTabpHandle = (e, value) => {
     e.preventDefault();
@@ -117,6 +173,15 @@ const AdminPage = () => {
     ));
   }
 
+  const BoardList = () => {
+    return boardList.map(board => (
+      <Box key={board.id} sx={{padding: '3px 0px 3px 3px', margin: '10px 0px 10px 0px', border: 'solid 1px var(--color3)'}}>
+        <BoardListTypographyName>{board.name}</BoardListTypographyName>
+        <BoardListTypographyPostCount>{board.postCount}</BoardListTypographyPostCount>
+      </Box>
+    ));
+  }
+
   return (
     <Contents>
       <CustomBox>
@@ -137,33 +202,37 @@ const AdminPage = () => {
             <Tab label='게시판 목록'sx={{color: 'var(--color3)', '&.Mui-selected': {
               color: 'var(--color4)'
             }}}/>
-            <Tab label='게시글 목록'sx={{color: 'var(--color3)', '&.Mui-selected': {
-              color: 'var(--color4)'
-            }}}/>
           </Tabs>
-      </CustomBox>
+      </CustomBox>    
 
-      <CustomBox>
-        <Box sx={{padding: '10px'}}>
-          <UserListTypographyNickname>별명</UserListTypographyNickname>
-          <UserListTypographyRole>권한</UserListTypographyRole>
-          <UserListTypographyDiable>상태</UserListTypographyDiable>
-          <UserListTypographyCreatedAt>가입 날짜</UserListTypographyCreatedAt>
-        </Box>
-        
-      </CustomBox>
+      <CustomTabPanel value={tabValue} index={0}>
+        <CustomBox>
+          <Box sx={{padding: '0px 0px 0px 10px'}}>
+            <UserListTypographyNickname>별명</UserListTypographyNickname>
+            <UserListTypographyRole>권한</UserListTypographyRole>
+            <UserListTypographyDiable>상태</UserListTypographyDiable>
+            <UserListTypographyCreatedAt>가입 날짜</UserListTypographyCreatedAt>
+          </Box>       
+        </CustomBox>
 
-      <CustomBox>
-        <CustomTabPanel value={tabValue} index={0}>
+        <CustomBox>
           {userList && <UserList/>}
-        </CustomTabPanel>
-        <CustomTabPanel value={tabValue} index={1}>
-          게시판 목록
-        </CustomTabPanel>
-        <CustomTabPanel value={tabValue} index={2}>
-          게시글 목록
-        </CustomTabPanel>
-      </CustomBox> 
+        </CustomBox>
+      </CustomTabPanel>
+
+      <CustomTabPanel value={tabValue} index={1}>
+        <CustomBox>
+          <Box sx={{padding: '0px 0px 0px 10px'}}>
+            <BoardListTypographyName>게시판 명</BoardListTypographyName>
+            <BoardListTypographyPostCount>게시글 수</BoardListTypographyPostCount>
+          </Box>       
+        </CustomBox>
+
+        <CustomBox>
+          {boardList && <BoardList/>}
+        </CustomBox>        
+      </CustomTabPanel>
+
       <Loading open={loading}/>
     </Contents>
   )

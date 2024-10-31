@@ -54,14 +54,6 @@ const MyPage = () => {
   const navigate = useNavigate();
 
   useEffect(()=>{
-    if(!recoilState.isLoggedIn){
-      navigate('/');
-    }
-  }, [recoilState])
-
- 
-
-  useEffect(()=>{
     setLoading(true);
 
     const getUserInfo = async() => {
@@ -77,6 +69,12 @@ const MyPage = () => {
 
     getUserInfo();
   }, []);
+
+  useEffect(()=>{
+    if(!recoilState.isLoggedIn){
+      navigate('/');
+    }
+  }, [recoilState]);
 
   const onClickNicknameModify = async (nickname) => {
     try{
@@ -346,7 +344,7 @@ const MyPage = () => {
           removeAccessToken();
           removeRefreshToken();
 
-          navigate('/');
+          window.location.reload();
         }
 
         setAlarmInfo({
