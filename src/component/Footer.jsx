@@ -12,7 +12,7 @@ const Footer = () =>{
           created by 전일우
         </CustomTypography>
         <CustomTypography sx={{fontSize: '14px', color: 'var(--color3)'}}>
-          email - ilwoo6422@naver.com
+          email: ilwoo6422@naver.com
         </CustomTypography>
       </Box>      
     </CustomBox>         

@@ -68,7 +68,7 @@ const UserRegister = () => {
     nickname: false,
   })
 
-  if(!recoilState.isLoggedIn){
+  if(recoilState.isLoggedIn){
     navigate('/');
   }
 
