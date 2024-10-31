@@ -9,6 +9,8 @@ import { useState } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import Loading from "../../component/ui/loading/Loading";
 import { CustomDialog, CustomDialogContent, CustomDialogTitle } from "../../component/ui/dialog/CustomDialog";
+import { useRecoilState } from "recoil";
+import { userState } from "../../utils/atom";
 
 
 const EmailValidation = () => {
@@ -22,6 +24,11 @@ const EmailValidation = () => {
     fail: false,
   });
   const [loading, setLoading] = useState(false);
+  const [recoilState, setRecoilState] = useRecoilState(userState);
+
+  if(recoilState.isLoggedIn) {
+    navigate('/');
+  }
 
   const onClickVerify = async () => {
 

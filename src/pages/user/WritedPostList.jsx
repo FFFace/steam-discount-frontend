@@ -10,6 +10,8 @@ import { PostListTypographyThumbs, PostListTypographyTitle, PostListTypographyWr
 import Loading from "../../component/ui/loading/Loading"
 import { CustomDialogError } from "../../component/ui/dialog/CustomDialog"
 import { CustomButton } from "../../component/ui/button/CustomButton"
+import { useRecoilState } from "recoil"
+import { userState } from "../../utils/atom"
 
 
 
@@ -23,8 +25,13 @@ const WritedPostList = () => {
     content: null,
     dialogAction: null
   });
+  const [recoilState, setRecoilState] = useRecoilState(userState);
 
   const navigate = useNavigate();
+
+  if(!recoilState.isLoggedIn){
+    navigate('/');
+  }
 
   const getWritedPost = async (page) => {
     setLoading(true);

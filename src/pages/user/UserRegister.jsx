@@ -8,6 +8,8 @@ import { Alert, typographyClasses } from "@mui/material";
 import { axiosInstance } from "../../utils/axios";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../component/ui/loading/Loading";
+import { useRecoilState } from "recoil";
+import { userState } from "../../utils/atom";
 
 const ALTER_ERROR_NOT_INPUT_ALL_INFOMATION = '모든 정보를 입력해주세요.';
 const ALTER_ERROR_NOT_MACHING_PASSWORD = '패스워드가 일치하지 않습니다.';
@@ -35,6 +37,7 @@ const UserRegister = () => {
 
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [recoilState, setRecoilState] = useRecoilState(userState);
 
   const [alter, setAlter] = useState({
     severity: 'error',
@@ -64,6 +67,10 @@ const UserRegister = () => {
     email: false,
     nickname: false,
   })
+
+  if(!recoilState.isLoggedIn){
+    navigate('/');
+  }
 
   const onChangeInfo = (e) => {
     setInfo({

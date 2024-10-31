@@ -42,6 +42,10 @@ const MyPage = () => {
 
   const navigate = useNavigate();
 
+  if(!recoilState.isLoggedIn){
+    navigate('/');
+  }
+
   useEffect(()=>{
     setLoading(true);
 

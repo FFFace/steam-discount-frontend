@@ -1,4 +1,4 @@
-import { useLocation, useSearchParams } from "react-router-dom"
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom"
 import Contents from "../../component/Contents"
 import { CustomBox } from "../../component/ui/box/CustomBox"
 import { useEffect, useRef, useState } from "react";
@@ -32,8 +32,13 @@ const WritePost = () => {
   const postNameRef = useRef();
 
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   let images = [];
+
+  if(!recoilState.isLoggedIn){
+    navigate('/');
+  }
 
   useEffect(() => {
     const getPost = async () => {
