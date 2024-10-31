@@ -41,9 +41,13 @@ const UserManager = () => {
     dialogAction: null
   })
 
-  if(!recoilState.isLoggedIn || recoilState.role !== 'ADMIN'){
-    navigate('/');
-  }
+  useEffect(()=>{
+    if(!recoilState.isLoggedIn || recoilState.role !== 'ADMIN'){
+      navigate('/');
+    }
+  }, [recoilState]);
+
+  
 
   const onClickDisableAccount = (e) => {
     e.preventDefault();
