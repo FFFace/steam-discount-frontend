@@ -18,6 +18,7 @@ import Board from './pages/board/Board';
 import MyPage from './pages/user/MyPage';
 import WritedPostList from './pages/user/WritedPostList';
 import AdminPage from './pages/admin/AdminPage';
+import UserManager from './pages/admin/UserManager';
 
 const theme = createTheme({
   typography: {
@@ -42,6 +43,7 @@ root.render(
           <Route path="/my-page" element={<MyPage />} />
           <Route path="/writed-post-list" element={<WritedPostList />} />
           <Route path='/admin-page' element={<AdminPage/>}/>
+          <Route path='/user-info' element={<UserManager/>}/>
         </Routes>
       </BrowserRouter>
     </RecoilRoot>
