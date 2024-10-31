@@ -68,9 +68,13 @@ const UserRegister = () => {
     nickname: false,
   })
 
-  if(recoilState.isLoggedIn){
-    navigate('/');
-  }
+  useEffect(()=>{
+    if(recoilState.isLoggedIn){
+      navigate('/');
+    }
+  }, [recoilState]);
+
+  
 
   const onChangeInfo = (e) => {
     setInfo({

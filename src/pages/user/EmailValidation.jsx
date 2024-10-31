@@ -5,7 +5,7 @@ import { CustomButton, CustomButtonWhite } from "../../component/ui/button/Custo
 import { CustomTextField } from "../../component/ui/textField/CustomTextField";
 import CustomTypography from "../../component/ui/typography/CustomTypography";
 import { axiosInstance } from "../../utils/axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import Loading from "../../component/ui/loading/Loading";
 import { CustomDialog, CustomDialogContent, CustomDialogTitle } from "../../component/ui/dialog/CustomDialog";
@@ -26,9 +26,11 @@ const EmailValidation = () => {
   const [loading, setLoading] = useState(false);
   const [recoilState, setRecoilState] = useRecoilState(userState);
 
-  if(recoilState.isLoggedIn) {
-    navigate('/');
-  }
+  useEffect(()=>{
+    if(recoilState.isLoggedIn) {
+      navigate('/');
+    }
+  }, [recoilState]);
 
   const onClickVerify = async () => {
 

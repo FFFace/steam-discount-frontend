@@ -36,9 +36,13 @@ const WritePost = () => {
 
   let images = [];
 
-  if(!recoilState.isLoggedIn){
-    navigate('/');
-  }
+  
+
+  useEffect(()=>{
+    if(!recoilState.isLoggedIn){
+      navigate('/');
+    }
+  }, [recoilState])
 
   useEffect(() => {
     const getPost = async () => {

@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import { Box, DialogActions, TextField } from "@mui/material";
 import Contents from "../../component/Contents"
 import { CustomBox } from "../../component/ui/box/CustomBox";
 import CustomTypography from "../../component/ui/typography/CustomTypography";
@@ -6,12 +6,13 @@ import { CustomTextField } from "../../component/ui/textField/CustomTextField";
 import { CustomButton, CustomButtonWhite } from "../../component/ui/button/CustomButton";
 import { useEffect, useRef, useState } from "react";
 import Loading from "../../component/ui/loading/Loading";
-import { CustomDialogAlarm, CustomDialogError } from "../../component/ui/dialog/CustomDialog";
+import { CustomDialog, CustomDialogAlarm, CustomDialogContent, CustomDialogError, CustomDialogErrorTitle, CustomDialogTitle, CustomDialogWarning } from "../../component/ui/dialog/CustomDialog";
 import { load } from "react-cookies";
 import { axiosInstance } from "../../utils/axios";
 import { useRecoilState } from "recoil";
 import { userState } from "../../utils/atom";
 import { useNavigate } from "react-router-dom";
+import { removeAccessToken, removeRefreshToken } from "../../utils/storage";
 
 const passwordRegEx = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}/;
 
@@ -33,6 +34,16 @@ const MyPage = () => {
     dialogAction: null
   });
 
+  const [warningInfo, setWarningInfo] = useState({
+    open: false,
+    title: null,
+    content: null,
+    dialogActionAccept: null,
+    dialogActionCancle: null
+  })
+
+  const [accountDisable, setAccountDisable] = useState(false);
+
   const [passwordModify, setPasswordModify] = useState(false);
   const [passwordModifyInfo, setPasswordModifyInfo] = useState({
     oldPassword: '',
@@ -42,9 +53,13 @@ const MyPage = () => {
 
   const navigate = useNavigate();
 
-  if(!recoilState.isLoggedIn){
-    navigate('/');
-  }
+  useEffect(()=>{
+    if(!recoilState.isLoggedIn){
+      navigate('/');
+    }
+  }, [recoilState])
+
+ 
 
   useEffect(()=>{
     setLoading(true);
@@ -265,6 +280,118 @@ const MyPage = () => {
     navigate('/writed-post-list');
   }
 
+  const onClickAccountDisable = (e) => {
+    e.preventDefault();
+
+    const dialogActionCancle = () => {
+      setWarningInfo({
+        ...warningInfo,
+        open: false
+      });
+    }
+
+    const dialogActionAccept = () => {
+      setAccountDisable(true);
+
+      dialogActionCancle();
+    }
+
+    setWarningInfo({
+      open: true,
+      title: '회원 탈퇴',
+      content: '회원 탈퇴를 하게되면 일부 서비스를 이용하실 수 없습니다.\n정말로 탈퇴 하시겠습니까?',
+      dialogActionAccept: dialogActionAccept,
+      dialogActionCancle: dialogActionCancle
+    })
+  }
+
+  const AccountDisableDialog = () => {
+
+    const accountDisableString = '더 이상 서비스를 이용하지 않겠습니다.';
+    const inputRef = useRef();
+
+    const onClickAccoutDisableButton = async (e) =>{
+      e.preventDefault();
+
+      if(inputRef.current?.value !== accountDisableString){
+
+        const dialogAction = () => {
+          setErrorInfo({
+            ...errorInfo,
+            open: false
+          });
+          setAccountDisable(false);
+        }
+
+        setErrorInfo({
+          open: true,
+          title: '회원 탈퇴 실패',
+          content: '입력된 문장이 정확히 입력되지 않았습니다.\n다시 시도해 주세요.',
+          dialogAction: dialogAction
+        })
+      }
+
+      setLoading(true);
+      try{
+        await axiosInstance.put('/users/disable');
+
+        const dialogAction = () => {
+          setRecoilState({
+            ...recoilState,
+            isLoggedIn: false,
+            nickname: null,
+            role: null
+          })
+  
+          removeAccessToken();
+          removeRefreshToken();
+
+          navigate('/');
+        }
+
+        setAlarmInfo({
+          open: true,
+          title: '회원 탈퇴 완료',
+          content: '회원 탈퇴가 정상적으로 완료되었습니다.\n그동안 이용해주셔서 감사합니다.',
+          dialogAction: dialogAction
+        })
+      } catch(exception){
+        console.log(exception);
+      }
+
+      setLoading(false);
+    }
+
+    return(
+      <CustomDialog open={accountDisable}>
+        <CustomDialogErrorTitle>회원 탈퇴</CustomDialogErrorTitle>
+        <CustomDialogContent>
+          회원 탈퇴를 진행하기 위해 아래의 문장을 정확히 입력해 주세요.<br/><br/><br/>
+          "{accountDisableString}"
+        </CustomDialogContent>
+        <Box sx={{textAlign: 'center'}}>
+          <TextField size="small" inputRef={inputRef} sx={{width: '90%', padding: '10px', ' .MuiOutlinedInput-root': {
+            color: 'white',
+            border: 'solid 1px var(--color2)',
+            backgroundColor: 'var(--color2)',
+            '&.Mui-focused fieldset': {
+              border: 'solid 2px gray'
+            }
+          },
+          '& .MuiInputBase-input.Mui-disabled': {
+            WebkitTextFillColor: 'var(--color3)'
+          }}}/>
+        </Box>
+        
+        <DialogActions>
+          <CustomButton onClick={onClickAccoutDisableButton}>
+            회원 탈퇴
+          </CustomButton>
+        </DialogActions>
+      </CustomDialog>
+    )
+  }
+
   return(
     <Contents>
       <CustomBox>
@@ -283,14 +410,17 @@ const MyPage = () => {
         <Box sx={{padding: '10px'}}>
           <CustomButtonWhite onClick={onClickPasswordModifyButton}>{passwordModify ? '비밀번호 변경 취소' : '비밀번호 변경'}</CustomButtonWhite>
           <CustomButtonWhite onClick={onClickWritedPostList}>내가 쓴 글</CustomButtonWhite>
+          <CustomButtonWhite onClick={onClickAccountDisable}>회원 탈퇴</CustomButtonWhite>
         </Box>
-       
+
       </CustomBox>
+      <AccountDisableDialog/>
       <CustomDialogError open={errorInfo.open} title={errorInfo.title} content={errorInfo.content} dialogAction={() => setErrorInfo({
         ...errorInfo,
         open: false
       })}/>
       <CustomDialogAlarm open={alarmInfo.open} title={alarmInfo.title} content={alarmInfo.content} dialogAction={alarmInfo.dialogAction}/>
+      <CustomDialogWarning open={warningInfo.open} title={warningInfo.title} content={warningInfo.content} dialogActionAccept={warningInfo.dialogActionAccept} dialogActionCancle={warningInfo.dialogActionCancle}/>
       <Loading open={loading}/>
     </Contents>
   )

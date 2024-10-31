@@ -29,9 +29,11 @@ const WritedPostList = () => {
 
   const navigate = useNavigate();
 
-  if(!recoilState.isLoggedIn){
-    navigate('/');
-  }
+  useEffect(()=>{
+    if(!recoilState.isLoggedIn){
+      navigate('/');
+    }
+  }, [recoilState]);  
 
   const getWritedPost = async (page) => {
     setLoading(true);
