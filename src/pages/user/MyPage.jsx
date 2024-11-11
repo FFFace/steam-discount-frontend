@@ -332,6 +332,7 @@ const MyPage = () => {
       setLoading(true);
       try{
         await axiosInstance.put('/users/disable');
+        await axiosInstance.post(`/logout`);
 
         const dialogAction = () => {
           setRecoilState({
