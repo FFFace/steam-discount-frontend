@@ -11,13 +11,9 @@ import '@toast-ui/editor/dist/theme/toastui-editor-dark.css';
 import { isMobile } from "react-device-detect";
 import { CustomButton, CustomButtonWhite } from "../../component/ui/button/CustomButton";
 import { axiosInstance } from "../../utils/axios";
-import { TrySharp } from "@mui/icons-material";
 import Loading from "../../component/ui/loading/Loading";
 import { useRecoilState } from "recoil";
 import { userState } from "../../utils/atom";
-import { deleteObject, getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
-import { storage } from "../../utils/firebase";
-import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 
 const WritePost = () => {
