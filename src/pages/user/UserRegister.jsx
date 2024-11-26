@@ -14,7 +14,7 @@ import { userState } from "../../utils/atom";
 const ALTER_ERROR_NOT_INPUT_ALL_INFOMATION = '모든 정보를 입력해주세요.';
 const ALTER_ERROR_NOT_MACHING_PASSWORD = '패스워드가 일치하지 않습니다.';
 const ALTER_ERROR_WRONG_EMAIL = '이메일 형식이 잘못되었습니다.';
-const ALTER_ERROR_TOO_SHORT_PASSWORD = '패스워드를 8자 이상 입력해주세요.';
+const ALTER_ERROR_TOO_SHORT_PASSWORD = '패스워드를 8자 이상, 특수문자, 영어, 숫자를 1개 이상 포함하여 입력해주세요.';
 const ALTER_ERROR_NEED_EMAIL_CHECK_DUPLICATE = '이메일 중복검사를 진행하지 않았습니다.';
 const ALTER_ERROR_NEED_NICKNAME_CHECK_DUPALICATE = '별명 중복검사를 진행하지 않았습니다.';
 const ALTER_ERROR_EMAIL_DUPLICATE_FAIL = '이미 사용중인 이메일 입니다.';
@@ -26,7 +26,7 @@ const TYPOGRAPHY_DUPLICATE_EMAIL = '사용할 수 있는 이메일 입니다.';
 
 const TYPOGRAPHY_NEED_DUPLICATE_NICKNAME = '별명 중복검사가 필요합니다.';
 const TYPOGRAPHY_FAIL_DUPLICATE_NICKNAME = '이미 사용중인 별명 입니다.';
-const TYPOGRAPHY_DUPLICATE_NICKNAME = '사용할 수 있는 이메일 입니다.';
+const TYPOGRAPHY_DUPLICATE_NICKNAME = '사용할 수 있는 별명 입니다.';
 
 const ALTER_SUCCESS = '회원가입을 진행해주세요';
 
@@ -190,8 +190,6 @@ const UserRegister = () => {
         ...duplicateInfo,
         email: response.data ? TYPOGRAPHY_DUPLICATE_EMAIL : TYPOGRAPHY_FAIL_DUPLICATE_EMAIL
       })
-
-      console.log(duplicate, duplicateCheck, duplicateInfo);
 
     } catch(exception){
       console.log(exception);
