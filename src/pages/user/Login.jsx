@@ -4,7 +4,7 @@ import { Box, DialogActions, dialogActionsClasses, DialogTitle} from "@mui/mater
 import { CustomBox } from "../../component/ui/box/CustomBox";
 import CustomTypography from "../../component/ui/typography/CustomTypography";
 import { CustomTextField } from "../../component/ui/textField/CustomTextField";
-import {CustomButton} from "../../component/ui/button/CustomButton";
+import {CustomButton, CustomButtonWhite} from "../../component/ui/button/CustomButton";
 import { useNavigate } from "react-router-dom";
 import { axiosInstance } from "../../utils/axios";
 import { setLoginState, saveAccessToken } from "../../utils/storage";
@@ -188,6 +188,9 @@ const Login = () => {
         <CustomTextField type='password' name='password' onChange={onChangeInfo} value={info.password}/>
 
         <Box sx={{margin: '25px 0px auto'}}>
+          <CustomButtonWhite href="http://localhost:8080/oauth2/authorization/google">
+            구글 로그인
+          </CustomButtonWhite>
           <LogInOutButton onClick={onClickLoginButton}>
             로그인
           </LogInOutButton>
