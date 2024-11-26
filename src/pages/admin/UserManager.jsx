@@ -42,9 +42,12 @@ const UserManager = () => {
   })
 
   useEffect(()=>{
-    if(!recoilState.isLoggedIn || recoilState.role !== 'ADMIN'){
-      navigate('/');
-    }
+    if(recoilState.isLoggedIn && recoilState.role){
+      if(!recoilState.isLoggedIn || recoilState.role !== 'ADMIN'){
+        console.log(recoilState.isLoggedIn, recoilState.role);
+        navigate('/');
+      }
+    } 
   }, [recoilState]);
 
   

@@ -72,15 +72,16 @@ const DiscountList = () => {
 
           if(!recoilState.isLoggedIn){
 
-            const dialogAccept  = () => {
+            const dialogClose  = () => {
               setErrorInfo({open:false});
+              setWarningInfo({open:false});
             }
 
             setErrorInfo({
               open: true,
               title: '권한 없음',
               content: '로그인이 필요한 작업입니다.\n로그인 후 다시 이용해 주세요.',
-              dialogAccept: dialogAccept
+              dialogAction: dialogClose
             });
 
             return;
