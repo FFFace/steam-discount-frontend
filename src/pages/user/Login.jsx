@@ -188,7 +188,7 @@ const Login = () => {
         <CustomTextField type='password' name='password' onChange={onChangeInfo} value={info.password}/>
 
         <Box sx={{margin: '25px 0px auto'}}>
-          <CustomButtonWhite href="http://localhost:8080/oauth2/authorization/google">
+          <CustomButtonWhite href="/oauth2/authorization/google">
             구글 로그인
           </CustomButtonWhite>
           <LogInOutButton onClick={onClickLoginButton}>
